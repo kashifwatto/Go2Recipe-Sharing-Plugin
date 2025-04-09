@@ -59,7 +59,7 @@ jQuery(document).ready(function ($) {
                         text: response.data.message,
                         timer: 2000,
                         showConfirmButton: false,
-                    }).then(() => {
+                    }).then(() => {  
                         window.location.href = response.data.redirect_url;
                     });
                 } else {
