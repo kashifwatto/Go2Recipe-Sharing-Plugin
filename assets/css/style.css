@@ -1,0 +1,75 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+
+*{
+    font-family: "Poppins", serif !important;
+}
+
+
+textarea {
+    border: 1px solid rgba(171, 167, 167, 1);
+    border-radius: 16px !important;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    color: rgba(102, 102, 102, 1);
+    height: 100px;
+}
+
+label {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 32px;
+    color: rgba(48, 48, 48, 1);
+    margin: 15px 0px;
+
+}
+
+input {
+    border: 1px solid rgba(171, 167, 167, 1) !important;
+    border-radius: 100px !important;
+    padding: 15px !important;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    color: rgba(102, 102, 102, 1);
+}
+
+select {
+    border: 1px solid rgba(171, 167, 167, 1);
+    border-radius: 100px;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    color: rgba(102, 102, 102, 1);
+}
+ input:focus,
+ textarea:focus,
+ select:focus {
+    outline: none !important;
+    border: 1px solid rgba(171, 167, 167, 1) !important;
+}
+
+.swal2-container {
+    z-index: 99666666666666666699 !important;
+}
+
+/* Default state: Show login/signup and hide profile (for guests) */
+#login_signup_container {
+    display: block;
+}
+
+#profile_container {
+    display: none;
+}
+
+/* If logged-in, show profile and hide login/signup */
+.logged-in #login_signup_container {
+    display: none;
+}
+
+.logged-in #profile_container {
+    display: block;
+}
