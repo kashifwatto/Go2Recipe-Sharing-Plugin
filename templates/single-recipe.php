@@ -12,9 +12,12 @@ $post = get_post($post_id);
 $dish_photo = get_post_meta($post_id, '_dish_photo', true);
 $video_link = get_post_meta($post_id, '_video_link', true);
 $catagory = get_post_meta($post_id, '_recipe_category', true);
-$prep_time = get_post_meta($post_id, '_preparation_time', true);
-$cooking_time = get_post_meta($post_id, '_cooking_time', true);
-$total_time = get_post_meta($post_id, '_total_time', true);
+$prep_time_hour = get_post_meta($post_id, '_preparation_time_hour', true);
+$prep_time_minutes = get_post_meta($post_id, '_preparation_time_minutes', true);
+$cooking_time_hour = get_post_meta($post_id, '_cooking_time_hour', true);
+$cooking_time_minutes = get_post_meta($post_id, '_cooking_time_minutes', true);
+$total_time_hour = get_post_meta($post_id, '_total_time_hour', true);
+$total_time_minutes = get_post_meta($post_id, '_total_time_minutes', true);
 $serving = get_post_meta($post_id, '_serving', true);
 $cuisine = get_post_meta($post_id, '_cuisine', true);
 $recipe_notes = get_post_meta($post_id, '_recipe_notes', true);
@@ -29,13 +32,22 @@ $author_name = get_the_author_meta('display_name', $author_id);
 $location = get_user_meta($author_id, 'location', true);
 $user_image = get_user_meta($author_id, 'user_image', true);
 
-if ($video_link) {
-    error_log($video_link);
-}
 
 
+$prep_time = null;
+$cooking_time = null;
+$total_time = null;
+$formatted_catagory = implode(', ', $catagory);
+$prep_time .= $prep_time_hour ? "$prep_time_hour hour" . ($prep_time_hour > 1 ? 's' : '') : '';
+$prep_time .= $prep_time_minutes ? ($prep_time ? ' ' : '') . "$prep_time_minutes minute" . ($prep_time_minutes > 1 ? 's' : '') : '';
+$cooking_time .= $cooking_time_hour ? "$cooking_time_hour hour" . ($cooking_time_hour > 1 ? 's' : '') : '';
+$cooking_time .= $cooking_time_minutes ? ($cooking_time ? ' ' : '') . "$cooking_time_minutes minute" . ($cooking_time_minutes > 1 ? 's' : '') : '';
+$total_time .= $total_time_hour ? "$total_time_hour hour" . ($total_time_hour > 1 ? 's' : '') : '';
+$total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_minutes minute" . ($total_time_minutes > 1 ? 's' : '') : '';
 ?>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap-grid.min.css" integrity="sha512-i1b/nzkVo97VN5WbEtaPebBG8REvjWeqNclJ6AItj7msdVcaveKrlIIByDpvjk5nwHjXkIqGZscVxOrTb9tsMA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap-grid.min.css" integrity="sha512-i1b/nzkVo97VN5WbEtaPebBG8REvjWeqNclJ6AItj7msdVcaveKrlIIByDpvjk5nwHjXkIqGZscVxOrTb9tsMA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js" integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
 
 <style>
     .top-header-title-part {
@@ -258,10 +270,7 @@ if ($video_link) {
         color: rgba(102, 102, 102, 1);
     }
 
-    .ingredients_part .ingredients_inner img {
-        width: 40px;
-        height: 40px;
-    }
+
 
     .reviews .reviews-inner {
         border: 1px solid rgba(171, 167, 167, 1);
@@ -379,15 +388,48 @@ if ($video_link) {
         background-color: #e04343;
     }
 
-    .askfrom_comunity-inner{
-        border:1px solid rgba(171, 167, 167, 1);
-        border-radius:12px;
-        padding:30px;
+    .askfrom_comunity-inner {
+        border: 1px solid rgba(171, 167, 167, 1);
+        border-radius: 12px;
+        padding: 30px;
     }
-    .askfrom_comunity-inner h3{ 
-        font-size:48px;
-        font-weight:700;
-        color:rgba(48, 48, 48, 1);
+
+    .askfrom_comunity-inner h3 {
+        font-size: 48px;
+        font-weight: 700;
+        color: rgba(48, 48, 48, 1);
+    }
+
+    .footerbuttoncontainer {
+        display: flex;
+        gap: 30px;
+        justify-content: right;
+    }
+
+    .footerbuttoncontainer #rejectbutton {
+        border: 1px solid rgba(255, 59, 59, 1);
+        color: rgba(255, 59, 59, 1);
+        background: #0000;
+        border-radius: 100px;
+        background-color: rgba(255, 59, 59, 1);
+        border: none;
+        padding: 15px 30px;
+        color: rgba(255, 255, 255, 1);
+        font-size: 22px;
+        font-weight: 600;
+
+    }
+
+    .footerbuttoncontainer #approvebutton {
+
+        border-radius: 100px;
+        background-color: green;
+        border: none;
+        padding: 15px 30px;
+        color: rgba(255, 255, 255, 1);
+        font-size: 22px;
+        font-weight: 600;
+
     }
 </style>
 
@@ -466,38 +508,38 @@ if ($video_link) {
             <div class="d-flex justify-content-between">
                 <div>
                     <h4 class="meta-name">Category</h4>
-                    <h5 class="meta-value"><?php echo $catagory;  ?></h5>
+                    <h5 class="meta-value"><?php echo $formatted_catagory; ?></h5>
                 </div>
                 <div>
                     <h4 class="meta-name">Prep Time</h4>
-                    <h5 class="meta-value"><?php echo $prep_time;  ?></h5>
+                    <h5 class="meta-value"><?php echo esc_html($prep_time);   ?></h5>
                 </div>
                 <div>
                     <h4 class="meta-name">Cook Time</h4>
-                    <h5 class="meta-value"><?php echo $cooking_time;  ?></h5>
+                    <h5 class="meta-value"><?php echo esc_html($cooking_time);  ?></h5>
                 </div>
                 <div>
                     <h4 class="meta-name">Total Time</h4>
-                    <h5 class="meta-value"><?php echo $total_time;  ?></h5>
+                    <h5 class="meta-value"><?php echo esc_html($total_time);  ?></h5>
                 </div>
 
             </div>
             <div class="d-flex justify-content-between">
                 <div>
                     <h4 class="meta-name">Cuisine</h4>
-                    <h5 class="meta-value"><?php echo $cuisine;  ?></h5>
+                    <h5 class="meta-value"><?php echo esc_html($cuisine);  ?></h5>
                 </div>
                 <div>
                     <h4 class="meta-name">Serving</h4>
-                    <h5 class="meta-value"><?php echo $serving;  ?></h5>
+                    <h5 class="meta-value"><?php echo esc_html($serving);  ?> People</h5>
                 </div>
                 <div>
                     <h4 class="meta-name">Cook Time</h4>
-                    <h5 class="meta-value"><?php echo $cooking_time;  ?></h5>
+                    <h5 class="meta-value"><?php echo esc_html($cooking_time);  ?></h5>
                 </div>
                 <div>
                     <h4 class="meta-name">Total Time</h4>
-                    <h5 class="meta-value"><?php echo $total_time;  ?></h5>
+                    <h5 class="meta-value"><?php echo esc_html($total_time);  ?></h5>
                 </div>
 
             </div>
@@ -527,22 +569,11 @@ if ($video_link) {
             <h3>Ingredients</h3>
             <div class="ingredients_inner">
                 <?php
-                foreach ($ingredients as $ingredient) {
-
-                ?> <div class="d-flex align-items-center gap-3 my-3">
-                        <div>
-
-                            <img src="<?php echo esc_url(recipe_sharing_dir_folder . 'assets/images/user-img.png'); ?>" alt="">
-                        </div>
-                        <div class="mx-4 mt-2">
-                            <p> <?php echo $ingredient['name'] ?></p>
-
-                        </div>
-                    </div>
-                <?php
-                }
+                echo $ingredients;
 
                 ?>
+
+
 
             </div>
 
@@ -551,165 +582,202 @@ if ($video_link) {
 
             <div class="steps_inner">
                 <?php
-                $number = 1;
-                foreach ($instructions as $instruction) {
-                    $step_image = $instruction['image'];
-                ?> <div class="my-3">
-                        <div class="">
-                            <p> <span><?php echo $number . '.';    ?> </span> <?php echo $instruction['text'] ?></p>
-
-                        </div>
-                        <div>
-
-                            <img src="<?php echo $step_image;  ?>" alt="">
-                        </div>
-
-                    </div>
-                <?php
-                    $number++;
-                }
-
+                echo $instructions;
                 ?>
+
+
+
+
             </div>
 
         </div>
-        <div class="row mt-5">
-            <div class="col-4 ">
-                <hr class="mt-4">
-            </div>
-            <div class="col-4 d-flex justify-content-center align-items-center">
-                <button class="jump_to_recipe">I Made It</button>
-            </div>
-            <div class="col-4">
-                <hr class="mt-4">
-            </div>
 
-        </div>
 
         <div class="nutrition_facts"></div>
-        <div class="askfrom_comunity">
-            <div class="askfrom_comunity-inner mt-5">
-                                <h3>Ask the Community (10)</h3>
-<h4>Pending Task</h4>
-            <form>
+        <?php if (current_user_can('subscriber')) : ?>
 
-            </form>
-
-
-            </div>
-        </div>
-        <div class="reviews">
-            <?php
-            $comments = get_comments(['post_id' => get_the_ID()]);
-            $total_reviews = count($comments); // Count total comments
-
-            $total_rating = 0;
-            $rating_count = 0;
-
-            foreach ($comments as $comment) {
-                $rating = get_comment_meta($comment->comment_ID, 'rating', true);
-                if ($rating) {
-                    $total_rating += $rating;
-                    $rating_count++;
-                }
-            }
-
-            // Calculate average rating
-            $average_rating = ($rating_count > 0) ? round($total_rating / $rating_count, 1) : 0;
-            ?>
-
-            <h2 class="container-heading">Reviews <?php echo number_format($total_reviews); ?>(<?php echo $average_rating; ?>)</h2>
-            <p>Check out our Community Guidelines about reviews.</p>
-
-            <div class="reviews-inner">
-                <!-- <h3>Apple Pie by Grandma Ople</h3> -->
-
-                <?php $comments = get_comments(['post_id' => $post_id, 'status' => 'approve']);
-                if (empty($comments)) {
-                ?>
-
-                    <div class="review-form">
-                        <form method="post" id="recipe-review-form">
-                            <div class="form-group rating-group">
-                                <label for="rating">Rating:</label>
-
-                                <div class="stars">
-                                    <input type="radio" id="star5" name="rating" value="5" required />
-                                    <label for="star5" title="5 stars">★</label>
-
-                                    <input type="radio" id="star4" name="rating" value="4" required />
-                                    <label for="star4" title="4 stars">★</label>
-
-                                    <input type="radio" id="star3" name="rating" value="3" required />
-                                    <label for="star3" title="3 stars">★</label>
-
-                                    <input type="radio" id="star2" name="rating" value="2" required />
-                                    <label for="star2" title="2 stars">★</label>
-
-                                    <input type="radio" id="star1" name="rating" value="1" required />
-                                    <label for="star1" title="1 star">★</label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="comment">Review:</label>
-                                <textarea
-                                    name="comment"
-                                    id="comment"
-                                    rows="4"
-                                    placeholder="A brief introduction or description of the recipe (e.g., its origin, flavor profile, or personal story behind it)"
-                                    required></textarea>
-                            </div>
-                            <div class="form-actions">
-                                <button type="button" class="btn-cancel mx-2">Cancel</button>
-                                <button type="submit" class="btn-submit">Submit</button>
-                            </div>
-                            <input type="hidden" name="post_id" value="<?php echo $post_id; ?>" />
-                            <input type="hidden" name="comment_parent" value="0" />
-                        </form>
+            <div class="reviews_container">
+                <div class="row mt-5">
+                    <div class="col-4 ">
+                        <hr class="mt-4">
+                    </div>
+                    <div class="col-4 d-flex justify-content-center align-items-center">
+                        <button class="jump_to_recipe">I Made It</button>
+                    </div>
+                    <div class="col-4">
+                        <hr class="mt-4">
                     </div>
 
-                <?php } ?>
-                <div>
+                </div>
+                <div class="askfrom_comunity">
+                    <div class="askfrom_comunity-inner mt-5">
+                        <h3>Ask the Community (10)</h3>
+                        <h4>Pending Task</h4>
+                        <form>
+
+                        </form>
+
+
+                    </div>
+                </div>
+                <div class="reviews">
                     <?php
-                    // Fetch existing comments (reviews) for the current post
-                    $comments = get_comments(['post_id' => $post_id, 'status' => 'approve']);
-                    if (!empty($comments)) {
-                        foreach ($comments as $comment) {
-                            $rating = get_comment_meta($comment->comment_ID, 'rating', true);
-                            $author_id = $comment->user_id;
-                            $user_image = get_user_meta($author_id, 'user_image', true);
+                    $comments = get_comments(['post_id' => get_the_ID()]);
+                    $total_reviews = count($comments); // Count total comments
 
-                    ?>
-                            <div class="review">
+                    $total_rating = 0;
+                    $rating_count = 0;
 
-                                <div class="image-part d-flex gap-3 ">
-                                    <div>
-                                        <img src="<?php echo $user_image;  ?>" alt="">
-                                    </div>
-                                    <div class="mx-2">
-                                        <p class="name" style="margin-bottom: -5px;">
-                                            <?php echo esc_html($comment->comment_author);  ?>
-                                        </p>
-
-                                        <p><?php echo str_repeat('⭐', (int)$rating); ?></p>
-
-
-                                    </div>
-                                </div>
-
-                                <p><?php echo esc_html($comment->comment_content); ?></p>
-                            </div>
-                            <hr>
-                    <?php
+                    foreach ($comments as $comment) {
+                        $rating = get_comment_meta($comment->comment_ID, 'rating', true);
+                        if ($rating) {
+                            $total_rating += $rating;
+                            $rating_count++;
                         }
-                    } else {
-                        echo '<p>No reviews yet. Be the first to leave a review!</p>';
                     }
+
+                    // Calculate average rating
+                    $average_rating = ($rating_count > 0) ? round($total_rating / $rating_count, 1) : 0;
                     ?>
+
+                    <h2 class="container-heading">Reviews <?php echo number_format($total_reviews); ?>(<?php echo $average_rating; ?>)</h2>
+                    <p>Check out our Community Guidelines about reviews.</p>
+
+                    <div class="reviews-inner">
+                        <!-- <h3>Apple Pie by Grandma Ople</h3> -->
+
+                        <?php $comments = get_comments(['post_id' => $post_id, 'status' => 'approve']);
+                        if (empty($comments)) {
+                        ?>
+
+                            <div class="review-form">
+                                <form method="post" id="recipe-review-form">
+                                    <div class="form-group rating-group">
+                                        <label for="rating">Rating:</label>
+
+                                        <div class="stars">
+                                            <input type="radio" id="star5" name="rating" value="5" required />
+                                            <label for="star5" title="5 stars">★</label>
+
+                                            <input type="radio" id="star4" name="rating" value="4" required />
+                                            <label for="star4" title="4 stars">★</label>
+
+                                            <input type="radio" id="star3" name="rating" value="3" required />
+                                            <label for="star3" title="3 stars">★</label>
+
+                                            <input type="radio" id="star2" name="rating" value="2" required />
+                                            <label for="star2" title="2 stars">★</label>
+
+                                            <input type="radio" id="star1" name="rating" value="1" required />
+                                            <label for="star1" title="1 star">★</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="comment">Review:</label>
+                                        <textarea
+                                            name="comment"
+                                            id="comment"
+                                            rows="4"
+                                            placeholder="A brief introduction or description of the recipe (e.g., its origin, flavor profile, or personal story behind it)"
+                                            required></textarea>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="button" class="btn-cancel mx-2">Cancel</button>
+                                        <button type="submit" class="btn-submit">Submit</button>
+                                    </div>
+                                    <input type="hidden" name="post_id" value="<?php echo $post_id; ?>" />
+                                    <input type="hidden" name="comment_parent" value="0" />
+                                </form>
+                            </div>
+
+                        <?php } ?>
+                        <div>
+                            <?php
+                            // Fetch existing comments (reviews) for the current post
+                            $comments = get_comments(['post_id' => $post_id, 'status' => 'approve']);
+                            if (!empty($comments)) {
+                                foreach ($comments as $comment) {
+                                    $rating = get_comment_meta($comment->comment_ID, 'rating', true);
+                                    $author_id = $comment->user_id;
+                                    $user_image = get_user_meta($author_id, 'user_image', true);
+
+                            ?>
+                                    <div class="review">
+
+                                        <div class="image-part d-flex gap-3 ">
+                                            <div>
+                                                <img src="<?php echo $user_image;  ?>" alt="">
+                                            </div>
+                                            <div class="mx-2">
+                                                <p class="name" style="margin-bottom: -5px;">
+                                                    <?php echo esc_html($comment->comment_author);  ?>
+                                                </p>
+
+                                                <p><?php echo str_repeat('⭐', (int)$rating); ?></p>
+
+
+                                            </div>
+                                        </div>
+
+                                        <p><?php echo esc_html($comment->comment_content); ?></p>
+                                    </div>
+                                    <hr>
+                            <?php
+                                }
+                            } else {
+                                echo '<p>No reviews yet. Be the first to leave a review!</p>';
+                            }
+                            ?>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        <?php endif; ?>
 
+        <?php if (current_user_can('editor') && get_post_status($post_id) !== 'publish') : ?>
+
+            <div class="editor-side-container mt-5">
+                <hr>
+                <div class=" footerbuttoncontainer">
+                    <div>
+
+                        <button type="button" id="rejectbutton"  data-bs-toggle="modal" data-bs-target="#rejectModal">Reject Recipe</button>
+                    </div>
+                    <div>
+
+                        <button type="button" id="approvebutton" data-post-id="<?php echo esc_attr($post_id); ?>">Approve Recipe</button>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="modal fade " id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog-centered">
+                    <form id="reject-recipe-form">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="rejectModalLabel">Reject Recipe</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <label for="reject_reason">Reason for Rejection:</label>
+                                <textarea name="reason" id="reject_reason" class="form-control" required></textarea>
+                                <input type="hidden" name="post_id" id="reject_post_id" value="<?php echo esc_attr($post_id); ?>">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger">Reject</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+         
+
+        <?php endif; ?>
 
     </div>
 

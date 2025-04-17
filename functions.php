@@ -43,6 +43,15 @@ function scripts_style_adding()
         null,
         true
     );
+    wp_enqueue_script(
+        'editorrolerecieptest',
+        plugin_dir_url(__FILE__) . 'assets/js/editorrolerecieptest.js',
+        ['jquery'],
+        null,
+        true
+    );
+    wp_enqueue_style('bootstrap-css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
+        wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js', [], null, true);
     wp_enqueue_style('style-css', plugin_dir_url(__FILE__) . 'assets/css/style.css',);
 
     wp_localize_script('register-user-script', 'ajax_object', [
@@ -268,7 +277,37 @@ function recipe_sharing_add_admin_menu()
         'manage_options',                   // Capability
         'edit.php?post_type=recipe'         // Redirect to Recipe post type list
     );
+    add_submenu_page(
+        'recipe_sharing',                          // Parent slug
+        __('Recipe Categories', 'textdomain'),     // Page title
+        __('Recipe Categories', 'textdomain'),     // Submenu title
+        'manage_options',                          // Capability
+        'recipe_categories',                       // Menu slug
+        'render_recipe_categories_page'            // Callback function
+    );
 }
+
+function recipe_custom_row_actions($actions, $post) {
+    if ($post->post_type !== 'recipe') {
+        return $actions;
+    }
+
+    // Remove the default "Preview" link
+    if (isset($actions['view'])) {
+        unset($actions['view']);
+    }
+
+    // Add "Test Recipe" link
+    $url = get_permalink($post->ID);
+    $actions['test_recipe'] = sprintf(
+        '<a href="%s" target="_blank" rel="noopener noreferrer">Test Recipe</a>',
+        esc_url($url)
+    );
+
+    return $actions;
+}
+add_filter('post_row_actions', 'recipe_custom_row_actions', 10, 2);
+
 
 // Callback for parent menu page (optional)
 function recipe_sharing_dashboard_page()
@@ -277,6 +316,35 @@ function recipe_sharing_dashboard_page()
     echo '<p>' . __('Welcome to the Recipe Sharing Dashboard!', 'textdomain') . '</p></div>';
 }
 
+function render_recipe_categories_page() {
+    // Handle form submission
+    if (isset($_POST['save_categories'])) {
+        if (current_user_can('manage_options')) {
+            $raw_input = sanitize_text_field($_POST['recipe_categories']);
+            $categories_array = array_map('trim', explode('|', $raw_input)); // Split by |
+            update_option('custom_recipe_categories', array_filter($categories_array));
+            echo '<div class="updated"><p>Categories updated.</p></div>';
+        }
+    }
+
+    // Get stored categories
+    $stored_categories = get_option('custom_recipe_categories', []);
+    $textarea_value = implode(' | ', $stored_categories); // Join with |
+    ?>
+    <div class="wrap">
+        <h1><?php _e('Manage Recipe Categories', 'textdomain'); ?></h1>
+        <form method="post">
+            <label for="recipe_categories"><?php _e('Enter categories separated by "|":', 'textdomain'); ?></label><br><br>
+            <textarea name="recipe_categories" id="recipe_categories" rows="5" cols="80"><?php echo esc_textarea($textarea_value); ?></textarea>
+            <br><br>
+            <input type="submit" name="save_categories" class="button button-primary" value="<?php _e('Save Categories', 'textdomain'); ?>">
+        </form>
+    </div>
+    <?php
+}
+
+
+
 add_action('admin_menu', 'recipe_sharing_add_admin_menu');
 
 
@@ -284,6 +352,7 @@ add_action('admin_menu', 'recipe_sharing_add_admin_menu');
 @include('includes/add-recipe.php');
 @include('includes/registeruser.php');
 @include('includes/edit-recipe.php');
+@include('includes/editorrolerecipetest.php');
 
 add_action('admin_head', 'load_custom_recipe_edit_template');
 

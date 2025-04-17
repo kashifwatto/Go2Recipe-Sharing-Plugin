@@ -216,9 +216,10 @@ wp_head();
         color: rgba(255, 59, 59, 1);
         background: #0000;
     }
+
     input.select2-search__field {
-    border: none !important;
-}
+        border: none !important;
+    }
 
     @media(max-width:767px) {
         .add-recipe-form {
@@ -333,22 +334,18 @@ wp_head();
             <div class="row">
                 <div class="col-md-6">
                     <label for="recipe_category"> Recipe Category </label>
-                    <select name="recipe_category[]" id="recipe_category" style="border:none !Important;" class="form-select form-select-solid" data-control="select2" data-close-on-select="false" data-placeholder="Select an Category" data-allow-clear="true" multiple="multiple">
-                        <option value="healthy_nutritious">Healthy & Nutritious</option>
-                        <option value="quick_easy">Quick & Easy</option>
-                        <option value="comfort_food">Comfort Food</option>
-                        <option value="vegetarian_vegan">Vegetarian & Vegan</option>
-                        <option value="gluten_free">Gluten-Free</option>
-                        <option value="low_carb_keto">Low-Carb & Keto</option>
-                        <option value="desserts_sweets">Desserts & Sweets</option>
-                        <option value="breakfast_brunch">Breakfast & Brunch</option>
-                        <option value="snacks_appetizers">Snacks & Appetizers</option>
-                        <option value="special_occasions_holidays">Special Occasions & Holidays</option>
-                        <option value="one_pot_slow_cooker">One-Pot & Slow Cooker</option>
-                        <option value="meal_prep_make_ahead">Meal Prep & Make-Ahead</option>
-                        <option value="kid_friendly">Kid-Friendly</option>
-                        <option value="juices_smoothies">Juices & Smoothies</option>
-                        <option value="active_lifestyle_meals">Active Lifestyle Meals</option>
+                    <?php $categories = get_option('custom_recipe_categories', []);
+                    ?>
+                    <select name="recipe_category[]" id="recipe_category" style="border:none !Important;" class="form-select form-select-solid"
+                        data-control="select2" data-close-on-select="false" data-placeholder="Select a Category" data-allow-clear="true" multiple="multiple">
+
+                        <?php foreach ($categories as $category):
+                            // Generate value and label
+                            $value = ucwords(str_replace('_', ' ', $category)); // e.g., 'Quick & Easy' => 'quick-easy'
+                            $label = ucwords(str_replace('_', ' ', $category)); // Format for display
+                        ?>
+                            <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                        <?php endforeach; ?>
                     </select>
 
 
