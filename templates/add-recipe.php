@@ -9,7 +9,7 @@ if (! defined('ABSPATH')) {
 get_header();
 wp_head();
 ?>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap-grid.min.css" integrity="sha512-i1b/nzkVo97VN5WbEtaPebBG8REvjWeqNclJ6AItj7msdVcaveKrlIIByDpvjk5nwHjXkIqGZscVxOrTb9tsMA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap-grid.min.css" integrity="sha512-i1b/nzkVo97VN5WbEtaPebBG8REvjWeqNclJ6AItj7msdVcaveKrlIIByDpvjk5nwHjXkIqGZscVxOrTb9tsMA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
 <script src="https://cdn.tiny.cloud/1/e7j9amg1yznezj5u8xskqm6hbzmpgonvzfmzivqqofxu3jhc/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -88,42 +88,7 @@ wp_head();
 
 
 
-    /* .add-recipe-form-inner .ingredients-container .ingredients-container-inner {
-        padding: 40px;
-        padding-bottom: 0px;
-        background-color: rgba(248, 247, 246, 1);
-        border-radius: 16px;
-    }
 
-    .add-recipe-form-inner .ingredients-container .ingredients-container-inner .ingredients-container-inner-button-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 20px 0px;
-
-    }
-
-    .add-recipe-form-inner .ingredients-container .ingredients-container-inner .ingredients-container-inner-input input {
-        margin: 10px 0px;
-
-    }
-
-    .add-recipe-form-inner .ingredients-container .ingredients-container-inner .ingredients-container-inner-input select {
-        margin: 10px 0px;
-
-    }
-
-    .ingredients-container-inner-button-container button {
-        border-radius: 100px;
-        background-color: rgba(255, 59, 59, 1);
-        border: none;
-        padding: 15px 30px;
-        color: rgba(255, 255, 255, 1);
-        font-size: 22px;
-        font-weight: 600;
-
-
-    } */
     .ingredients-container-inner-button-container button {
         border-radius: 100px;
         background-color: rgba(255, 59, 59, 1);
@@ -211,7 +176,7 @@ wp_head();
         justify-content: right;
     }
 
-    .footerbuttoncontainer #cancelbutton {
+    .footerbuttoncontainer #saveasdraft {
         border: 1px solid rgba(255, 59, 59, 1);
         color: rgba(255, 59, 59, 1);
         background: #0000;
@@ -223,12 +188,25 @@ wp_head();
 
     @media(max-width:767px) {
         .add-recipe-form {
-            padding: 10px;
+            padding: 20px;
 
         }
 
         .add-recipe-form-inner {
             padding: 10px;
+        }
+
+        .add-recipe-form-first-part h2 {
+            font-size: 24px;
+        }
+
+        .ingredients-container-inner-button-container button {
+
+            padding: 5px 15px;
+
+            font-size: 16px;
+
+
         }
     }
 </style>
@@ -294,42 +272,38 @@ wp_head();
             <label> Your Inspiration behind the dish </label>
             <input type="text" name="inspiration" placeholder="Your Inspiration behind the dish">
             <div class="ingredients-container">
-                <label for="">Ingredients</label>
                 <script>
                     tinymce.init({
                         selector: 'textarea.ingredients-editor',
                         plugins: [
-                            // Core editing features
-                            'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-                            // Your account includes a free trial of TinyMCE premium features
-                            // Try the most popular premium features until Apr 22, 2025:
-                            'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown', 'importword', 'exportword', 'exportpdf'
+                            'anchor', 'autolink', 'charmap', 'codesample', 'emoticons',
+                            'image', 'link', 'lists', 'media', 'searchreplace',
+                            'table', 'visualblocks', 'wordcount'
                         ],
-                        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-                        tinycomments_mode: 'embedded',
-                        tinycomments_author: 'Author name',
-                        mergetags_list: [{
-                                value: 'First.Name',
-                                title: 'First Name'
-                            },
-                            {
-                                value: 'Email',
-                                title: 'Email'
-                            },
-                        ],
-                        ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+                        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | ' +
+                            'link image media table | numlist bullist indent outdent | ' +
+                            'emoticons charmap | removeformat',
+                        menubar: false,
+                        branding: false,
+                        height: 300
                     });
                 </script>
+
+                <!-- Your textarea -->
+                <label for="">Ingredients</label>
+
                 <textarea class="ingredients-editor" name="ingredients">
 
-</textarea>
+                </textarea>
 
             </div>
             <div class="ingredients-container recipe-instructions mt-3">
                 <label for="">Recipe Instructions</label>
                 <textarea class="ingredients-editor" name="instructions">
 
-</textarea>
+                </textarea>
+
+
             </div>
             <div class="row">
                 <div class="col-md-6">
@@ -443,7 +417,7 @@ wp_head();
             <div>
                 <label> Recipe Notes (Optional)
                 </label>
-                <textarea name="recipe_notes" id=""> Any tips or variations the author wants to add (e.g., substitutions, helpful information, advice, or special instructions).</textarea>
+                <textarea name="recipe_notes"> Any tips or variations the author wants to add (e.g., substitutions, helpful information, advice, or special instructions).</textarea>
             </div>
             <div class="submitbuttoncontainer row">
                 <div class="col-md-6">
@@ -452,117 +426,28 @@ wp_head();
                     <div style="margin-bottom:50px;">
 
                         <input type="checkbox" name="formconfirm" id="confirm">
-                        <label for="confirm" style="font-size:16px; font-weight:400;">I confirm that this recipe is my own genuine creation.</label>
+                        <label for="confirm" style="font-size:16px; font-weight:400; display:inline">I confirm that this recipe is my own genuine creation.</label>
                     </div>
                 </div>
                 <div class=" col-md-6 ingredients-container-inner-button-container footerbuttoncontainer">
                     <div>
 
-                        <button type="button" id="cancelbutton">Cancel</button>
+                        <!-- <button type="button" id="saveasdraft">Save as draft</button> -->
                     </div>
                     <div>
 
-                        <button type="submit" id="submitbutton">Submit Recipe</button>
+                        <button type="submit" id="submitbutton">Publish Recipe</button>
                     </div>
 
                 </div>
+                <input type="hidden" name="post_status" id="post_status" value="publish">
+
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        //     const addButton = document.getElementById('add-ingredient');
-        //     const inputContainer = document.querySelector('.ingredients-container-inner-input');
-        //     let ingredientCount = 1;
-        //     addButton.addEventListener('click', function() {
-        //         const newinstructionblocks = `
-        //                           <div class="col-md-6">
-
-        //                         <input type="text" name="ingredients[${ingredientCount}][name]" placeholder="Add Ingredients">
-        //                     </div>
-        //                     <div class="col-md-6">
-        //                         <select name="ingredients[${ingredientCount}][unit]" >
-        //                             <option value="gram">Gram</option>
-        //                             <option value="Celsius">Celsius</option>
-        //                             <option value="Cm">Cm</option>                            </select>
-
-        //                     </div>
-        //      `;
-
-        //         inputContainer.insertAdjacentHTML('beforeend', newinstructionblocks);
-
-        //         // Increment the counter for the next instruction
-        //         ingredientCount++;
-
-        //     });
-
-        //     const addInstructionButton = document.getElementById('add-new-instruction');
-        //     const instructionsContainer = document.querySelector('.recipe-instructions-container');
-        //     let instructionCount = 1; // Initialize a counter to track the number of instructions
-
-        //     addInstructionButton.addEventListener('click', function() {
-        //         // Define the HTML block to be added
-        //         const newInstructionBlock = `
-        //     <div class="row">
-        //         <div class="col-md-4">
-        //             <label class="photo-upload">
-        //                 <img src="https://img.icons8.com/ios/50/000000/camera--v1.png" alt="Camera Icon">
-        //                 <span class="span">Add Photo</span>
-        //                 <input type="file" name="instructions[${instructionCount}][image]" accept="image/*">
-        //             </label>
-        //         </div>
-        //         <div class="col-md-8">
-        //             <textarea name="instructions[${instructionCount}][text]" placeholder="Instruction text"></textarea>
-        //         </div>
-        //     </div>
-        // `;
-
-        //         // Add the new block to the instructions container
-        //         instructionsContainer.insertAdjacentHTML('beforeend', newInstructionBlock);
-
-        //         // Increment the counter for the next instruction
-        //         instructionCount++;
-
-
-        //     });
-
-
-        //     // Event delegation for handling image previews
-        //     instructionsContainer.addEventListener('change', function(event) {
-        //         const input = event.target;
-
-        //         // Check if the changed element is a file input
-        //         if (input.type === 'file' && input.accept.includes('image/*')) {
-        //             if (input.files && input.files[0]) {
-        //                 const reader = new FileReader();
-
-        //                 reader.onload = function(e) {
-        //                     // Find the closest <img> element and update its src
-        //                     const previewImg = input.closest('.photo-upload').querySelector('img');
-        //                     const span = input.closest('.photo-upload').querySelector('.span');
-        //                     if (span) {
-        //                         span.style.display = 'none';
-        //                     }
-        //                     if (previewImg) {
-        //                         previewImg.src = e.target.result;
-        //                     }
-        //                 };
-
-        //                 reader.readAsDataURL(input.files[0]); // Read the file as a data URL
-        //             }
-        //         }
-        //     });
-
-
-    });
-
-
-
-
-
-
     document.getElementById('dish_photo_input').addEventListener('change', function(event) {
         const input = event.target;
         if (input.files && input.files[0]) {
@@ -586,7 +471,13 @@ wp_head();
                 placeholder: "Select Recipe Categories"
             });
         });
+      
     });
+    //   document.getElementById('submitbutton').addEventListener('click', function() {
+    //         document.getElementById('post_status').value = 'publish';
+    //     });
+  
+        
 </script>
 
 

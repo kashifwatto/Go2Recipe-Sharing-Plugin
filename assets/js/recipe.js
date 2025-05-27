@@ -1,7 +1,13 @@
 jQuery(document).ready(function ($) {
 
-    
+    // document.getElementById('saveasdraft').addEventListener('click', function (e) {
+    //     e.preventDefault();
+    //     alert();
+    //     document.getElementById('post_status').value = 'draft';
+    //     document.getElementById('add_recipe').submit(); // manually submit form
+    // });
     $('#add_recipe').on('submit', function (e) {
+        // alert();
         e.preventDefault();
         let addrecipeData = new FormData(this);
         addrecipeData.append('action', 'recipe_sharing_by_kashif_watto_add_recipe');
@@ -59,7 +65,7 @@ jQuery(document).ready(function ($) {
                         text: response.data.message,
                         timer: 2000,
                         showConfirmButton: false,
-                    }).then(() => {  
+                    }).then(() => {
                         window.location.href = response.data.redirect_url;
                     });
                 } else {
@@ -126,6 +132,6 @@ jQuery(document).ready(function ($) {
             },
         });
     });
-    
+
 });
 

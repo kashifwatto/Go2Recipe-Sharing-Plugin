@@ -1,0 +1,74 @@
+            <div class="row">
+                <div class="col-md-6">
+                    <?php $categories = get_option('custom_recipe_categories', []);
+                    ?>
+
+                    <label for="edit_recipe_category"> Recipe Category </label>
+                    <select name="recipe_category[]" id="edit_recipe_category" style="border:none !Important;" class="form-select form-select-solid"
+                        data-control="select2" data-close-on-select="false" data-placeholder="Select a Category" data-allow-clear="true" multiple="multiple">
+
+                        <?php foreach ($categories as $category):
+                            // Generate value and label
+                            $value = ucwords(str_replace('_', ' ', $category)); // e.g., 'Quick & Easy' => 'quick-easy'
+                            $label = ucwords(str_replace('_', ' ', $category)); // Format for display
+                        ?>
+                            <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+
+
+                </div>
+                <div class="col-md-6">
+                    <label for="cuisine">Cuisine </label>
+                    <select name="cuisine" id="Cuisine">
+                        <option value="american" <?php selected($cuisine, 'american'); ?>>American</option>
+                        <option value="argentinian" <?php selected($cuisine, 'argentinian'); ?>>Argentinian</option>
+                        <option value="australian_new_zealander" <?php selected($cuisine, 'australian_new_zealander'); ?>>Australian and New Zealander</option>
+                        <option value="austrian" <?php selected($cuisine, 'austrian'); ?>>Austrian</option>
+                        <option value="bangladeshi" <?php selected($cuisine, 'bangladeshi'); ?>>Bangladeshi</option>
+                        <option value="belgian" <?php selected($cuisine, 'belgian'); ?>>Belgian</option>
+                        <option value="brazilian" <?php selected($cuisine, 'brazilian'); ?>>Brazilian</option>
+                        <option value="canadian" <?php selected($cuisine, 'canadian'); ?>>Canadian</option>
+                        <option value="chilean" <?php selected($cuisine, 'chilean'); ?>>Chilean</option>
+                        <option value="chinese" <?php selected($cuisine, 'chinese'); ?>>Chinese</option>
+                        <option value="colombian" <?php selected($cuisine, 'colombian'); ?>>Colombian</option>
+                        <option value="cuban" <?php selected($cuisine, 'cuban'); ?>>Cuban</option>
+                        <option value="danish" <?php selected($cuisine, 'danish'); ?>>Danish</option>
+                        <option value="dutch" <?php selected($cuisine, 'dutch'); ?>>Dutch</option>
+                        <option value="filipino" <?php selected($cuisine, 'filipino'); ?>>Filipino</option>
+                        <option value="finnish" <?php selected($cuisine, 'finnish'); ?>>Finnish</option>
+                        <option value="french" <?php selected($cuisine, 'french'); ?>>French</option>
+                        <option value="german" <?php selected($cuisine, 'german'); ?>>German</option>
+                        <option value="greek" <?php selected($cuisine, 'greek'); ?>>Greek</option>
+                        <option value="indian" <?php selected($cuisine, 'indian'); ?>>Indian</option>
+                        <option value="indonesian" <?php selected($cuisine, 'indonesian'); ?>>Indonesian</option>
+                        <option value="israeli" <?php selected($cuisine, 'israeli'); ?>>Israeli</option>
+                        <option value="italian" <?php selected($cuisine, 'italian'); ?>>Italian</option>
+                        <option value="jamaican" <?php selected($cuisine, 'jamaican'); ?>>Jamaican</option>
+                        <option value="japanese" <?php selected($cuisine, 'japanese'); ?>>Japanese</option>
+                        <option value="jewish" <?php selected($cuisine, 'jewish'); ?>>Jewish</option>
+                        <option value="korean" <?php selected($cuisine, 'korean'); ?>>Korean</option>
+                        <option value="lebanese" <?php selected($cuisine, 'lebanese'); ?>>Lebanese</option>
+                        <option value="malaysian" <?php selected($cuisine, 'malaysian'); ?>>Malaysian</option>
+                        <option value="mexican" <?php selected($cuisine, 'mexican'); ?>>Mexican</option>
+                        <option value="norwegian" <?php selected($cuisine, 'norwegian'); ?>>Norwegian</option>
+                        <option value="pakistani" <?php selected($cuisine, 'pakistani'); ?>>Pakistani</option>
+                        <option value="persian" <?php selected($cuisine, 'persian'); ?>>Persian</option>
+                        <option value="peruvian" <?php selected($cuisine, 'peruvian'); ?>>Peruvian</option>
+                        <option value="polish" <?php selected($cuisine, 'polish'); ?>>Polish</option>
+                        <option value="portuguese" <?php selected($cuisine, 'portuguese'); ?>>Portuguese</option>
+                        <option value="puerto_rican" <?php selected($cuisine, 'puerto_rican'); ?>>Puerto Rican</option>
+                        <option value="russian" <?php selected($cuisine, 'russian'); ?>>Russian</option>
+                        <option value="scandinavian" <?php selected($cuisine, 'scandinavian'); ?>>Scandinavian</option>
+                        <option value="south_african" <?php selected($cuisine, 'south_african'); ?>>South African</option>
+                        <option value="spanish" <?php selected($cuisine, 'spanish'); ?>>Spanish</option>
+                        <option value="swedish" <?php selected($cuisine, 'swedish'); ?>>Swedish</option>
+                        <option value="swiss" <?php selected($cuisine, 'swiss'); ?>>Swiss</option>
+                        <option value="thai" <?php selected($cuisine, 'thai'); ?>>Thai</option>
+                        <option value="turkish" <?php selected($cuisine, 'turkish'); ?>>Turkish</option>
+                        <option value="vietnamese" <?php selected($cuisine, 'vietnamese'); ?>>Vietnamese</option>
+                    </select>
+
+                </div>
+
+            </div>

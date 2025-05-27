@@ -58,7 +58,7 @@ select {
 
 /* Default state: Show login/signup and hide profile (for guests) */
 #login_signup_container {
-    display: block;
+    display:flex;
 }
 
 #profile_container {
@@ -71,5 +71,5 @@ select {
 }
 
 .logged-in #profile_container {
-    display: block;
+    display: flex;
 }

@@ -10,15 +10,18 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
     {
 
         // Extract and sanitize form data
-        error_log('POST Data: ' . print_r($_POST, true));
+        // error_log('POST Data: ' . print_r($_POST, true));
 
-
+        $post_status = sanitize_text_field($_POST['post_status']);
+        error_log($post_status);
+        return;
         $title = sanitize_text_field($_POST['title'] ?? '');
         $description = wp_kses_post($_POST['description'] ?? '');
         $inspiration = sanitize_text_field($_POST['inspiration'] ?? '');
-        $instructions = sanitize_text_field($_POST['instructions'] ?? '');
-        $ingredients = sanitize_text_field($_POST['ingredients'] ?? '');
-        
+        $instructions = wp_kses_post($_POST['instructions'] ?? '');
+        $ingredients = wp_kses_post($_POST['ingredients'] ?? '');
+
+
         $recipe_category = isset($_POST['recipe_category']) ? array_map('sanitize_text_field', $_POST['recipe_category']) : [];
         $cuisine = sanitize_text_field($_POST['cuisine'] ?? '');
         $preparation_time_hour = sanitize_text_field($_POST['preparation_time_hour'] ?? '');
@@ -41,13 +44,13 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
 
         // Get the current user
         $user_id = get_current_user_id();
-       
+
         // Prepare post data
         $post_data = [
             'post_title'   => $title,
             'post_content' => $description,
             'post_author'  => $user_id,
-            'post_status'  => 'pending', // Set to 'pending' for admin review
+            'post_status'  => 'publish', // Set to 'pending' for admin review
             'post_type'    => 'recipe',  // Replace with your custom post type
         ];
 
@@ -62,8 +65,8 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
         // Save custom fields and metadata
         // Process Ingredients
 
-     
-        update_post_meta($post_id, '_instructions', $instructions);        
+
+        update_post_meta($post_id, '_instructions', $instructions);
         update_post_meta($post_id, '_ingredients', $ingredients);
         update_post_meta($post_id, '_inspiration', $inspiration);
         update_post_meta($post_id, '_recipe_category', $recipe_category);
@@ -122,13 +125,16 @@ if (!function_exists('recipe_sharing_by_kashif_watto_edit_recipe')) {
         $post_id = sanitize_text_field($_POST['post_id'] ?? '');
         $description = wp_kses_post($_POST['description'] ?? '');
         $inspiration = sanitize_text_field($_POST['inspiration'] ?? '');
-        $instructions = $_POST['instructions'] ?? [];
-        $ingredients = $_POST['ingredients'] ?? [];
-        $recipe_category = sanitize_text_field($_POST['recipe_category'] ?? '');
-        $cuisine = sanitize_text_field($_POST['cuisine'] ?? '');
-        $preparation_time = sanitize_text_field($_POST['preparation_time'] ?? '');
-        $cooking_time = sanitize_text_field($_POST['cooking_time'] ?? '');
-        $total_time = sanitize_text_field($_POST['total_time'] ?? '');
+        $instructions = wp_kses_post($_POST['instructions'] ?? '');
+        $ingredients = wp_kses_post($_POST['ingredients'] ?? '');
+        // $recipe_category = sanitize_text_field($_POST['recipe_category'] ?? '');
+        // $cuisine = sanitize_text_field($_POST['cuisine'] ?? '');
+        $preparation_time_hour = sanitize_text_field($_POST['preparation_time_hour'] ?? '');
+        $preparation_time_minutes = sanitize_text_field($_POST['preparation_time_minutes'] ?? '');
+        $cooking_time_hour = sanitize_text_field($_POST['cooking_time_hour'] ?? '');
+        $cooking_time_minutes = sanitize_text_field($_POST['cooking_time_minutes'] ?? '');
+        $total_time_hour = sanitize_text_field($_POST['total_time_hour'] ?? '');
+        $total_time_minutes = sanitize_text_field($_POST['total_time_minutes'] ?? '');
         $serving = intval($_POST['serving'] ?? 0);
         $video_link = esc_url_raw($_POST['video_link'] ?? '');
         $recipe_notes = wp_kses_post($_POST['recipe_notes'] ?? '');
@@ -156,67 +162,19 @@ if (!function_exists('recipe_sharing_by_kashif_watto_edit_recipe')) {
         // Save custom fields and metadata
         // Process Ingredients
 
-        // Process Recipe Instructions
-        $processed_instructions = [];
-        if (!empty($instructions)) {
-            foreach ($instructions as $index => $instruction) {
-                $instruction_text = sanitize_text_field($instruction['text'] ?? '');
 
-                // Handle image upload
-                if (!empty($_FILES['instructions']['name'][$index]['image'])) {
-                    require_once(ABSPATH . 'wp-admin/includes/file.php');
-                    $file = [
-                        'name'     => $_FILES['instructions']['name'][$index]['image'],
-                        'type'     => $_FILES['instructions']['type'][$index]['image'],
-                        'tmp_name' => $_FILES['instructions']['tmp_name'][$index]['image'],
-                        'error'    => $_FILES['instructions']['error'][$index]['image'],
-                        'size'     => $_FILES['instructions']['size'][$index]['image'],
-                    ];
-
-                    // Use WordPress file handling functions
-                    require_once(ABSPATH . 'wp-admin/includes/file.php');
-                    $upload = wp_handle_upload($file, ['test_form' => false]);
-
-                    if (isset($upload['file'])) {
-                        $instruction_image = $upload['url'];
-                    }
-                }
-
-                // Save the instruction
-                $processed_instructions[] = [
-                    'text'  => $instruction_text,
-                    'image' => $instruction_image,
-                ];
-            }
-        }
-        update_post_meta($post_id, '_instructions', $processed_instructions);
-
-        // for ingredeints 
-        $processed_instructions = [];
-        if (!empty($ingredients)) {
-            foreach ($ingredients as $index => $instruction) {
-                $ingredeints_text = sanitize_text_field($instruction['name'] ?? '');
-                $ingredeints_unit = sanitize_text_field($_POST['ingredients'][$index]['unit'] ?? '');
-
-
-
-
-                // Save the instruction
-                $processed_instructions[] = [
-                    'name'  => $ingredeints_text,
-                    'unit' => $ingredeints_unit,
-                ];
-            }
-        }
-        update_post_meta($post_id, '_ingredients', $processed_instructions);
-
+        update_post_meta($post_id, '_instructions', $instructions);
+        update_post_meta($post_id, '_ingredients', $ingredients);
         // Save other custom fields and metadata
         update_post_meta($post_id, '_inspiration', $inspiration);
-        update_post_meta($post_id, '_recipe_category', $recipe_category);
-        update_post_meta($post_id, '_cuisine', $cuisine);
-        update_post_meta($post_id, '_preparation_time', $preparation_time);
-        update_post_meta($post_id, '_cooking_time', $cooking_time);
-        update_post_meta($post_id, '_total_time', $total_time);
+        // update_post_meta($post_id, '_recipe_category', $recipe_category);
+        // update_post_meta($post_id, '_cuisine', $cuisine);
+        update_post_meta($post_id, '_preparation_time_hour', $preparation_time_hour);
+        update_post_meta($post_id, '_preparation_time_minutes', $preparation_time_minutes);
+        update_post_meta($post_id, '_cooking_time_hour', $cooking_time_hour);
+        update_post_meta($post_id, '_cooking_time_minutes', $cooking_time_minutes);
+        update_post_meta($post_id, '_total_time_hour', $total_time_hour);
+        update_post_meta($post_id, '_total_time_minutes', $total_time_minutes);
         update_post_meta($post_id, '_serving', $serving);
         update_post_meta($post_id, '_video_link', $video_link);
         update_post_meta($post_id, '_recipe_notes', $recipe_notes);

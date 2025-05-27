@@ -51,7 +51,7 @@ function register_user_via_ajax()
     }
 
     // Success response.
-    wp_send_json_success(['message' => 'User registered successfully. Redirecting...', 'redirect_url' => site_url('add-recipe/')]);
+    wp_send_json_success(['message' => 'User registered successfully. Redirecting...', 'redirect_url' => site_url('/personal-info/')]);
     exit;
 }
 // Start of login user logic
@@ -98,7 +98,7 @@ function login_user_via_ajax()
     }
     
     // Success response
-    wp_send_json_success(['message' => 'Login successful. Redirecting...', 'redirect_url' => site_url('add-recipe/')]);
+    wp_send_json_success(['message' => 'Login successful. Redirecting...', 'redirect_url' => site_url('/personal-info/')]);
     exit;
     
 }

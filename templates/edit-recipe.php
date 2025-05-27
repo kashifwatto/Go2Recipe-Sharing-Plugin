@@ -1,13 +1,13 @@
 <?php
 
 /*
-Template Name: Add Recipe
+Template Name: Edit Recipe
 */
 if (! defined('ABSPATH')) {
     exit;
 }
+// wp_head();
 get_header();
-wp_head();
 
 
 $post_id = $_GET['post'] ?? 0;
@@ -19,10 +19,14 @@ $plain_text_description = wp_strip_all_tags($description);
 
 $dish_photo = get_post_meta($post_id, '_dish_photo', true);
 $video_link = get_post_meta($post_id, '_video_link', true);
-$catagory = get_post_meta($post_id, '_recipe_category', true);
-$prep_time = get_post_meta($post_id, '_preparation_time', true);
-$cooking_time = get_post_meta($post_id, '_cooking_time', true);
-$total_time = get_post_meta($post_id, '_total_time', true);
+// $catagory = get_post_meta($post_id, '_recipe_category', true);
+$preparation_time_hour = get_post_meta($post_id, '_preparation_time_hour', true);
+$preparation_time_minutes = get_post_meta($post_id, '_preparation_time_minutes', true);
+$cooking_time_hour = get_post_meta($post_id, '_cooking_time_hour', true);
+$cooking_time_minutes = get_post_meta($post_id, '_cooking_time_minutes', true);
+$total_time_hour = get_post_meta($post_id, '_total_time_hour', true);
+$total_time_minutes = get_post_meta($post_id, '_total_time_minutes', true);
+
 $serving = get_post_meta($post_id, '_serving', true);
 $cuisine = get_post_meta($post_id, '_cuisine', true);
 $recipe_notes = get_post_meta($post_id, '_recipe_notes', true);
@@ -30,9 +34,11 @@ $unique_confirm = get_post_meta($post_id, '_unique_confirm', true);
 $insipiration = get_post_meta($post_id, '_inspiration', true);
 $ingredients = get_post_meta($post_id, '_ingredients', true);
 $instructions = get_post_meta($post_id, '_instructions', true);
-error_log(json_encode($instructions));
+
 ?>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap-grid.min.css" integrity="sha512-i1b/nzkVo97VN5WbEtaPebBG8REvjWeqNclJ6AItj7msdVcaveKrlIIByDpvjk5nwHjXkIqGZscVxOrTb9tsMA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdn.tiny.cloud/1/e7j9amg1yznezj5u8xskqm6hbzmpgonvzfmzivqqofxu3jhc/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
     .add-recipe-top-header {
         width: 100%;
@@ -298,221 +304,80 @@ error_log(json_encode($instructions));
 
             <label> Your Inspiration behind the dish </label>
             <input type="text" name="inspiration" value="<?php echo esc_html($insipiration); ?>" placeholder="Your Inspiration behind the dish">
+            <script>
+                tinymce.init({
+                    selector: 'textarea.ingredients-editor',
+                    plugins: [
+                        'anchor', 'autolink', 'charmap', 'codesample', 'emoticons',
+                        'image', 'link', 'lists', 'media', 'searchreplace',
+                        'table', 'visualblocks', 'wordcount'
+                    ],
+                    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | ' +
+                        'link image media table | numlist bullist indent outdent | ' +
+                        'emoticons charmap | removeformat',
+                    menubar: false,
+                    branding: false,
+                    height: 300
+                });
+            </script>
             <div class="ingredients-container">
                 <label for="">Ingredients</label>
-                <div class="ingredients-container-inner">
-                    <div class="ingredients-container-inner-input row">
-                        <?php
-
-                        if (!empty($ingredients) && is_array($ingredients)) {
-                            foreach ($ingredients as $index => $ingredient) {
-                                $name = esc_attr($ingredient['name']); // Escape the name
-                                $unit = esc_attr($ingredient['unit']); // Escape the unit
-                        ?>
-                                <div class="col-md-6">
-                                    <input type="text" name="ingredients[<?php echo $index; ?>][name]" placeholder="Add Ingredients" value="<?php echo $name; ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <select name="ingredients[<?php echo $index; ?>][unit]">
-                                        <option value="gram" <?php selected($unit, 'gram'); ?>>Gram</option>
-                                        <option value="Celsius" <?php selected($unit, 'Celsius'); ?>>Celsius</option>
-                                        <option value="Cm" <?php selected($unit, 'Cm'); ?>>Cm</option>
-                                    </select>
-                                </div>
-                            <?php
-                            }
-                        } else {
-                            // If no ingredients exist, display a single empty input
-                            ?>
-                            <div class="col-md-6">
-                                <input type="text" name="ingredients[0][name]" placeholder="Add Ingredients">
-                            </div>
-                            <div class="col-md-6">
-                                <select name="ingredients[0][unit]">
-                                    <option value="gram">Gram</option>
-                                    <option value="Celsius">Celsius</option>
-                                    <option value="Cm">Cm</option>
-                                </select>
-                            </div>
-                        <?php
-                        }
-                        ?>
-                    </div>
-                    <div class="ingredients-container-inner-button-container">
-                        <div>
-                            <button type="button" id="add-ingredient">+ Add New Ingredient</button>
-                        </div>
-                        <div>
-                            <img src="<?php echo esc_url(recipe_sharing_dir_folder . '/assets/images/3.png'); ?>" alt="">
-                        </div>
-                    </div>
-                </div>
+                <textarea class="ingredients-editor" name="ingredients">
+                 <?php echo esc_html($ingredients); ?>
+                </textarea>
             </div>
 
             <div class="ingredients-container recipe-instructions">
                 <label for="">Recipe Instructions</label>
-                <div class="ingredients-container-inner recipe-instruction-inner">
-                    <div class="recipe-instructions-container">
-                        <?php
-                        // Fetch instructions data from the meta
-                        $instructions = get_post_meta($post_id, '_instructions', true);
+                <textarea class="ingredients-editor" name="instructions">
+                <?php echo esc_html($instructions); ?>
+                </textarea>
 
-                        if (!empty($instructions) && is_array($instructions)) {
-                            foreach ($instructions as $index => $instruction) {
-                                $text = esc_textarea($instruction['text']); // Escape the text
-                                $image = esc_url($instruction['image']); // Escape the image URL
-                        ?>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label class="photo-upload">
-                                            <img src="<?php echo $image ? $image : 'https://img.icons8.com/ios/50/000000/camera--v1.png'; ?>" alt="Instruction Image">
-                                            <?php if (!$image): ?>
-                                                <span class="span">Add Photo</span>
-                                            <?php endif; ?>
+            </div>
 
-                                            <input name="instructions[<?php echo $index; ?>][image]" type="file" accept="image/*">
 
-                                        </label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <textarea name="instructions[<?php echo $index; ?>][text]" placeholder="Instruction text"><?php echo $text; ?></textarea>
-                                    </div>
-                                </div>
-                            <?php
-                            }
-                        } else {
-                            // If no instructions exist, display a single empty block
-                            ?>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label class="photo-upload">
-                                        <img src="https://img.icons8.com/ios/50/000000/camera--v1.png" alt="Camera Icon">
-                                        <span class="span">Add Photo</span>
-                                        <input name="instructions[0][image]" type="file" accept="image/*">
-                                    </label>
-                                </div>
-                                <div class="col-md-8">
-                                    <textarea name="instructions[0][text]" placeholder="Instruction text"></textarea>
-                                </div>
-                            </div>
-                        <?php
-                        }
-                        ?>
-                    </div>
-
-                    <div class="ingredients-container-inner-button-container">
-                        <div>
-                            <button type="button" id="add-new-instruction">+ Add New Instructions</button>
+            <div class="row">
+                <div class="col-md-6">
+                    <label> Preparation Time </label>
+                    <div class="row">
+                        <div class="col-6"> <input type="text" name="preparation_time_hour" placeholder="0 hour"  value="<?php echo esc_html($preparation_time_hour); ?>">
                         </div>
-                        <div>
-                            <img src="<?php echo esc_url(recipe_sharing_dir_folder . '/assets/images/4.png'); ?>" alt="">
+                        <div class="col-6"> <input type="text" name="preparation_time_minutes" placeholder="0 minutes" value="<?php echo esc_html($preparation_time_minutes); ?>">
                         </div>
                     </div>
                 </div>
-
-            </div>
-            <div class="row">
                 <div class="col-md-6">
-                    <label for="recipe_category"> Recipe Category </label>
-                    <select name="recipe_category" id="recipe_category">
-                        <option value="healthy_nutritious" <?php selected($catagory, 'healthy_nutritious'); ?>>Healthy & Nutritious</option>
-                        <option value="quick_easy" <?php selected($catagory, 'quick_easy'); ?>>Quick & Easy</option>
-                        <option value="comfort_food" <?php selected($catagory, 'comfort_food'); ?>>Comfort Food</option>
-                        <option value="vegetarian_vegan" <?php selected($catagory, 'vegetarian_vegan'); ?>>Vegetarian & Vegan</option>
-                        <option value="gluten_free" <?php selected($catagory, 'gluten_free'); ?>>Gluten-Free</option>
-                        <option value="low_carb_keto" <?php selected($catagory, 'low_carb_keto'); ?>>Low-Carb & Keto</option>
-                        <option value="desserts_sweets" <?php selected($catagory, 'desserts_sweets'); ?>>Desserts & Sweets</option>
-                        <option value="breakfast_brunch" <?php selected($catagory, 'breakfast_brunch'); ?>>Breakfast & Brunch</option>
-                        <option value="snacks_appetizers" <?php selected($catagory, 'snacks_appetizers'); ?>>Snacks & Appetizers</option>
-                        <option value="special_occasions_holidays" <?php selected($catagory, 'special_occasions_holidays'); ?>>Special Occasions & Holidays</option>
-                        <option value="one_pot_slow_cooker" <?php selected($catagory, 'one_pot_slow_cooker'); ?>>One-Pot & Slow Cooker</option>
-                        <option value="meal_prep_make_ahead" <?php selected($catagory, 'meal_prep_make_ahead'); ?>>Meal Prep & Make-Ahead</option>
-                        <option value="kid_friendly" <?php selected($catagory, 'kid_friendly'); ?>>Kid-Friendly</option>
-                        <option value="juices_smoothies" <?php selected($catagory, 'juices_smoothies'); ?>>Juices & Smoothies</option>
-                        <option value="active_lifestyle_meals" <?php selected($catagory, 'active_lifestyle_meals'); ?>>Active Lifestyle Meals</option>
-                    </select>
-
-                </div>
-                <div class="col-md-6">
-                    <label for="cuisine">Cuisine </label>
-                    <select name="cuisine" id="Cuisine">
-                        <option value="american" <?php selected($cuisine, 'american'); ?>>American</option>
-                        <option value="argentinian" <?php selected($cuisine, 'argentinian'); ?>>Argentinian</option>
-                        <option value="australian_new_zealander" <?php selected($cuisine, 'australian_new_zealander'); ?>>Australian and New Zealander</option>
-                        <option value="austrian" <?php selected($cuisine, 'austrian'); ?>>Austrian</option>
-                        <option value="bangladeshi" <?php selected($cuisine, 'bangladeshi'); ?>>Bangladeshi</option>
-                        <option value="belgian" <?php selected($cuisine, 'belgian'); ?>>Belgian</option>
-                        <option value="brazilian" <?php selected($cuisine, 'brazilian'); ?>>Brazilian</option>
-                        <option value="canadian" <?php selected($cuisine, 'canadian'); ?>>Canadian</option>
-                        <option value="chilean" <?php selected($cuisine, 'chilean'); ?>>Chilean</option>
-                        <option value="chinese" <?php selected($cuisine, 'chinese'); ?>>Chinese</option>
-                        <option value="colombian" <?php selected($cuisine, 'colombian'); ?>>Colombian</option>
-                        <option value="cuban" <?php selected($cuisine, 'cuban'); ?>>Cuban</option>
-                        <option value="danish" <?php selected($cuisine, 'danish'); ?>>Danish</option>
-                        <option value="dutch" <?php selected($cuisine, 'dutch'); ?>>Dutch</option>
-                        <option value="filipino" <?php selected($cuisine, 'filipino'); ?>>Filipino</option>
-                        <option value="finnish" <?php selected($cuisine, 'finnish'); ?>>Finnish</option>
-                        <option value="french" <?php selected($cuisine, 'french'); ?>>French</option>
-                        <option value="german" <?php selected($cuisine, 'german'); ?>>German</option>
-                        <option value="greek" <?php selected($cuisine, 'greek'); ?>>Greek</option>
-                        <option value="indian" <?php selected($cuisine, 'indian'); ?>>Indian</option>
-                        <option value="indonesian" <?php selected($cuisine, 'indonesian'); ?>>Indonesian</option>
-                        <option value="israeli" <?php selected($cuisine, 'israeli'); ?>>Israeli</option>
-                        <option value="italian" <?php selected($cuisine, 'italian'); ?>>Italian</option>
-                        <option value="jamaican" <?php selected($cuisine, 'jamaican'); ?>>Jamaican</option>
-                        <option value="japanese" <?php selected($cuisine, 'japanese'); ?>>Japanese</option>
-                        <option value="jewish" <?php selected($cuisine, 'jewish'); ?>>Jewish</option>
-                        <option value="korean" <?php selected($cuisine, 'korean'); ?>>Korean</option>
-                        <option value="lebanese" <?php selected($cuisine, 'lebanese'); ?>>Lebanese</option>
-                        <option value="malaysian" <?php selected($cuisine, 'malaysian'); ?>>Malaysian</option>
-                        <option value="mexican" <?php selected($cuisine, 'mexican'); ?>>Mexican</option>
-                        <option value="norwegian" <?php selected($cuisine, 'norwegian'); ?>>Norwegian</option>
-                        <option value="pakistani" <?php selected($cuisine, 'pakistani'); ?>>Pakistani</option>
-                        <option value="persian" <?php selected($cuisine, 'persian'); ?>>Persian</option>
-                        <option value="peruvian" <?php selected($cuisine, 'peruvian'); ?>>Peruvian</option>
-                        <option value="polish" <?php selected($cuisine, 'polish'); ?>>Polish</option>
-                        <option value="portuguese" <?php selected($cuisine, 'portuguese'); ?>>Portuguese</option>
-                        <option value="puerto_rican" <?php selected($cuisine, 'puerto_rican'); ?>>Puerto Rican</option>
-                        <option value="russian" <?php selected($cuisine, 'russian'); ?>>Russian</option>
-                        <option value="scandinavian" <?php selected($cuisine, 'scandinavian'); ?>>Scandinavian</option>
-                        <option value="south_african" <?php selected($cuisine, 'south_african'); ?>>South African</option>
-                        <option value="spanish" <?php selected($cuisine, 'spanish'); ?>>Spanish</option>
-                        <option value="swedish" <?php selected($cuisine, 'swedish'); ?>>Swedish</option>
-                        <option value="swiss" <?php selected($cuisine, 'swiss'); ?>>Swiss</option>
-                        <option value="thai" <?php selected($cuisine, 'thai'); ?>>Thai</option>
-                        <option value="turkish" <?php selected($cuisine, 'turkish'); ?>>Turkish</option>
-                        <option value="vietnamese" <?php selected($cuisine, 'vietnamese'); ?>>Vietnamese</option>
-                    </select>
-
-                </div>
-
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <label> Preparation Time (In Minutes) </label>
-                    <input type="number" name="preparation_time" value="<?php echo esc_html($prep_time); ?>" placeholder="15 minutes">
-                </div>
-                <div class="col-md-6">
-                    <label> Cooking Time (In Minutes) </label>
-                    <input type="number" name="cooking_time" value="<?php echo esc_html($cooking_time); ?>" placeholder="The time required to cook the recipe">
+                    <label> Cooking Time </label>
+                    <div class="row">
+                        <div class="col-6"> <input type="text" name="cooking_time_hour" placeholder="0 hour"  value="<?php echo esc_html($cooking_time_hour); ?>">
+                        </div>
+                        <div class="col-6"> <input type="text" name="cooking_time_minutes" placeholder="0 minutes" value="<?php echo esc_html($cooking_time_minutes); ?>">
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
 
                 <div class="col-md-6">
-                    <label> Total Time (In Minutes) </label>
-                    <input type="number" name="total_time" value="<?php echo esc_html($total_time); ?>" placeholder="20 minutes">
+                    <label> Total Time </label>
+                    <div class="row">
+                        <div class="col-6"> <input type="text" name="total_time_hour" placeholder="0 hour"   value="<?php echo esc_html($total_time_hour); ?>">
+                        </div>
+                        <div class="col-6"> <input type="text" name="total_time_minutes" placeholder="0 minutes" value="<?php echo esc_html($total_time_minutes); ?>">
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <label> Serving </label>
-                    <input type="number" name="serving" value="<?php echo esc_html($serving); ?>" placeholder="20 minutes">
+                    <input type="number" name="serving" placeholder="5 People">
                 </div>
             </div>
+         
 
             <div>
                 <label> Recipe Notes (Optional)
                 </label>
-                <textarea name="recipe_notes" id=""> <?php echo esc_html($recipe_notes); ?></textarea>
+                <textarea name="recipe_notes" > <?php echo esc_html($recipe_notes); ?></textarea>
             </div>
             <div class="submitbuttoncontainer row">
                 <div class="col-md-6">
@@ -542,110 +407,35 @@ error_log(json_encode($instructions));
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const addButton = document.getElementById('add-ingredient');
-        const inputContainer = document.querySelector('.ingredients-container-inner-input');
-        let ingredientCount = inputContainer.querySelectorAll('input[name^="ingredients"]').length;
-        addButton.addEventListener('click', function() {
-            const newinstructionblocks = `
-                              <div class="col-md-6">
-
-                            <input type="text" name="ingredients[${ingredientCount}][name]" placeholder="Add Ingredients">
-                        </div>
-                        <div class="col-md-6">
-                            <select name="ingredients[${ingredientCount}][unit]" >
-                                <option value="gram">Gram</option>
-                                <option value="Celsius">Celsius</option>
-                                <option value="Cm">Cm</option>                            </select>
-
-                        </div>
-         `;
-
-            inputContainer.insertAdjacentHTML('beforeend', newinstructionblocks);
-
-            // Increment the counter for the next instruction
-            ingredientCount++;
-
-        });
-
-        const addInstructionButton = document.getElementById('add-new-instruction');
-        const instructionsContainer = document.querySelector('.recipe-instructions-container');
-        let instructionCount = instructionsContainer.querySelectorAll('.row').length;
-
-        addInstructionButton.addEventListener('click', function() {
-            // Define the HTML block to be added
-            const newInstructionBlock = `
-        <div class="row">
-            <div class="col-md-4">
-                <label class="photo-upload">
-                    <img src="https://img.icons8.com/ios/50/000000/camera--v1.png" alt="Camera Icon">
-                    <span class="span">Add Photo</span>
-                    <input type="file" name="instructions[${instructionCount}][image]" accept="image/*">
-                </label>
-            </div>
-            <div class="col-md-8">
-                <textarea name="instructions[${instructionCount}][text]" placeholder="Instruction text"></textarea>
-            </div>
-        </div>
-    `;
-
-            // Add the new block to the instructions container
-            instructionsContainer.insertAdjacentHTML('beforeend', newInstructionBlock);
-
-            // Increment the counter for the next instruction
-            instructionCount++;
 
 
-        });
 
 
-        // Event delegation for handling image previews
-        instructionsContainer.addEventListener('change', function(event) {
-            const input = event.target;
 
-            // Check if the changed element is a file input
-            if (input.type === 'file' && input.accept.includes('image/*')) {
-                if (input.files && input.files[0]) {
-                    const reader = new FileReader();
+                document.getElementById('dish_photo_input').addEventListener('change', function(event) {
+                    const input = event.target;
+                    if (input.files && input.files[0]) {
+                        const reader = new FileReader();
 
-                    reader.onload = function(e) {
-                        // Find the closest <img> element and update its src
-                        const previewImg = input.closest('.photo-upload').querySelector('img');
-                        const span = input.closest('.photo-upload').querySelector('.span');
-                        if (span) {
-                            span.style.display = 'none';
-                        }
-                        if (previewImg) {
-                            previewImg.src = e.target.result;
-                        }
-                    };
+                        reader.onload = function(e) {
+                            const dish_photo_preview = document.getElementById('dish_photo_preview');
 
-                    reader.readAsDataURL(input.files[0]); // Read the file as a data URL
-                }
+                            dish_photo_preview.src = e.target.result; // Set the preview image to the file's data URL
+
+                        };
+
+                        reader.readAsDataURL(input.files[0]); // Read the file as a data URL
+                    }
+                });
+
+                jQuery(function($) {
+                    $('#edit_recipe_category').select2({
+                        placeholder: "Select Recipe Categories"
+                    });
+                });
+
             }
-        });
-    });
-
-
-
-
-
-
-    document.getElementById('dish_photo_input').addEventListener('change', function(event) {
-        const input = event.target;
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                const dish_photo_preview = document.getElementById('dish_photo_preview');
-
-                dish_photo_preview.src = e.target.result; // Set the preview image to the file's data URL
-
-            };
-
-            reader.readAsDataURL(input.files[0]); // Read the file as a data URL
-        }
-    });
 </script>
 
 
-<?php get_footer(); ?>
+<?php  get_footer(); ?>

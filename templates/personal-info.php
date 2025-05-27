@@ -7,10 +7,10 @@ if (! defined('ABSPATH')) {
 }
 get_header();
 wp_head();
-$name='';
-$location='';
-$details='';
-$user_image='https://img.icons8.com/ios/50/000000/camera--v1.png';
+$name = '';
+$location = '';
+$details = '';
+$user_image = 'https://img.icons8.com/ios/50/000000/camera--v1.png';
 if (is_user_logged_in()) {
     $current_user_id = get_current_user_id();
 
@@ -21,7 +21,7 @@ if (is_user_logged_in()) {
     $user_image = get_user_meta($current_user_id, 'user_image', true);
 }
 ?>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap-grid.min.css" integrity="sha512-i1b/nzkVo97VN5WbEtaPebBG8REvjWeqNclJ6AItj7msdVcaveKrlIIByDpvjk5nwHjXkIqGZscVxOrTb9tsMA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap-grid.min.css" integrity="sha512-i1b/nzkVo97VN5WbEtaPebBG8REvjWeqNclJ6AItj7msdVcaveKrlIIByDpvjk5nwHjXkIqGZscVxOrTb9tsMA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
 <style>
     .menu-inner,
     .info-setting-container {
@@ -141,8 +141,18 @@ if (is_user_logged_in()) {
         font-family: Poppins;
         font-size: 36px;
         font-weight: 600;
-        line-height: 60px;
+        /* line-height: 60px; */
 
+    }
+
+    @media(max-width:767px) {
+        .info-setting-container-button h2 {
+            font-size: 24px;
+        }
+
+        .info-setting-container-button button {
+            font-size: 14px;
+        }
     }
 </style>
 <div class="container">
@@ -159,11 +169,15 @@ if (is_user_logged_in()) {
                     </div>
                 </div>
                 <hr>
+                <a href="<?php echo site_url('/add-recipe/'); ?>" class="menu">Add new Recipe</a>
+
+                <hr>
                 <a href="<?php echo site_url('/personal-info/'); ?>" class="menu active">Personal Info</a>
                 <hr>
                 <a href="<?php echo site_url('/your-recipes/'); ?>" class="menu">Your Recipes</a>
                 <hr>
-                <a href="<?php echo site_url('/saved-recipes-collections/'); ?>" class="menu">Saved Recipes & Collections</a>
+                <!-- <a href="<?php // echo site_url('/saved-recipes-collections/'); 
+                                ?>" class="menu">Saved Recipes & Collections</a> -->
             </div>
 
             <div>
@@ -178,7 +192,7 @@ if (is_user_logged_in()) {
                         <h2>Profile Setting</h2>
                     </div>
                     <div>
-                    <button type="submit">Save Changes</button>
+                        <button type="submit">Save Changes</button>
 
                     </div>
                 </div>
@@ -194,7 +208,7 @@ if (is_user_logged_in()) {
                     <label class="photo-upload">
                         <div class="imagePreviewcontainer">
 
-                            <img id="imagePreview" src="<?php   echo $user_image;  ?>" alt="Camera Icon">
+                            <img id="imagePreview" src="<?php echo $user_image;  ?>" alt="Camera Icon">
                         </div>
                         <span>Add Photo</span>
                         <input id="imageInput" name="userimage" type="file" accept="image/*">

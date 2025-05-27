@@ -67,7 +67,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
         font-size: 48px;
         font-weight: 700;
-        line-height: 72px;
+
         letter-spacing: 0.02em;
         text-align: left;
         text-underline-position: from-font;
@@ -99,7 +99,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
     }
 
     .container-part-inner {
-        width: 80%;
+        width: 90%;
     }
 
     .image-part img {
@@ -152,7 +152,6 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
     .container-heading {
         font-size: 48px;
         font-weight: 700;
-        line-height: 60px;
         letter-spacing: 0.01em;
         text-align: left;
         text-underline-position: from-font;
@@ -238,10 +237,15 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
     }
 
+    .ingredients_part {
+        /* border: 1px solid red; */
+        overflow: hidden;
+    }
+
     .ingredients_part h1 {
         font-size: 48px;
         font-weight: 700;
-        line-height: 60px;
+        /* line-height: 60px; */
         letter-spacing: 0.01em;
         text-align: left;
         text-underline-position: from-font;
@@ -252,7 +256,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
     .ingredients_part h3 {
         font-size: 36px;
         font-weight: 600;
-        line-height: 60px;
+        /* line-height: 60px; */
         letter-spacing: 0.01em;
         text-align: left;
         text-underline-position: from-font;
@@ -268,6 +272,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
         text-underline-position: from-font;
         text-decoration-skip-ink: none;
         color: rgba(102, 102, 102, 1);
+
     }
 
 
@@ -431,12 +436,60 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
         font-weight: 600;
 
     }
+
+    @media(max-width:767px) {
+        .container-part {
+            padding: 10px 5%;
+            width: 95%;
+        }
+
+        .container-part-inner {
+            width: 100%;
+        }
+
+        .top-header-title-part {
+            padding: 10px;
+        }
+
+        .top-header-title-part h1 {
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .top-header-title-part button {
+            font-size: 14px;
+        }
+
+        .container-heading {
+            font-size: 24px;
+        }
+
+        .author-profile-part .button-part button {
+            padding: 5px 15px;
+            font-size: 14px;
+        }
+
+        .jump_to_recipe {
+            font-size: 18px;
+            padding:5px 15px;
+        }
+
+        hr.mt-4 {
+            display: none;
+        }
+        .ingredients_part h1 {
+            font-size: 24px;
+        }
+        .ingredients_part h3 {
+            font-size: 24px;
+        }
+    }
 </style>
 
 <div class="top-header-title-part" style="background-image: url(' <?php echo esc_url($dish_photo) ?>  ');">
     <div>
         <?php
-        echo '<h1>' . esc_html($post->post_title) . '</h1>';
+        echo '<h1> ererefserterte' . esc_html($post->post_title) . '</h1>';
         ?>
 
     </div>
@@ -497,47 +550,47 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                 </div>
             </div>
             <div class="col-md-6 d-flex justify-content-end">
-                <div class="button-part d-flex justify-content-end align-items-center gap-3 ">
+                <div class="button-part d-flex justify-content-end align-items-center ">
                     <button> VIew Profile</button>
                     <button> Add To Favorite</button>
                 </div>
             </div>
         </div>
 
-        <div class="after-author-meta">
-            <div class="d-flex justify-content-between">
-                <div>
+        <div class="after-author-meta mt-2">
+            <div class="row">
+                <div class="col-6 col-md-3">
                     <h4 class="meta-name">Category</h4>
                     <h5 class="meta-value"><?php echo $formatted_catagory; ?></h5>
                 </div>
-                <div>
+                <div class="col-6 col-md-3">
                     <h4 class="meta-name">Prep Time</h4>
                     <h5 class="meta-value"><?php echo esc_html($prep_time);   ?></h5>
                 </div>
-                <div>
+                <div class="col-6 col-md-3">
                     <h4 class="meta-name">Cook Time</h4>
                     <h5 class="meta-value"><?php echo esc_html($cooking_time);  ?></h5>
                 </div>
-                <div>
+                <div class="col-6 col-md-3">
                     <h4 class="meta-name">Total Time</h4>
                     <h5 class="meta-value"><?php echo esc_html($total_time);  ?></h5>
                 </div>
 
             </div>
-            <div class="d-flex justify-content-between">
-                <div>
+            <div class="row">
+                <div class="col-6 col-md-3">
                     <h4 class="meta-name">Cuisine</h4>
                     <h5 class="meta-value"><?php echo esc_html($cuisine);  ?></h5>
                 </div>
-                <div>
+                <div class="col-6 col-md-3">
                     <h4 class="meta-name">Serving</h4>
                     <h5 class="meta-value"><?php echo esc_html($serving);  ?> People</h5>
                 </div>
-                <div>
+                <div class="col-6 col-md-3">
                     <h4 class="meta-name">Cook Time</h4>
                     <h5 class="meta-value"><?php echo esc_html($cooking_time);  ?></h5>
                 </div>
-                <div>
+                <div class="col-6 col-md-3">
                     <h4 class="meta-name">Total Time</h4>
                     <h5 class="meta-value"><?php echo esc_html($total_time);  ?></h5>
                 </div>
@@ -594,7 +647,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
 
         <div class="nutrition_facts"></div>
-        <?php if (current_user_can('subscriber')) : ?>
+        <?php if (!current_user_can('editor')) : ?>
 
             <div class="reviews_container">
                 <div class="row mt-5">
@@ -609,7 +662,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                     </div>
 
                 </div>
-                <div class="askfrom_comunity">
+                <!-- <div class="askfrom_comunity">
                     <div class="askfrom_comunity-inner mt-5">
                         <h3>Ask the Community (10)</h3>
                         <h4>Pending Task</h4>
@@ -619,7 +672,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
 
                     </div>
-                </div>
+                </div> -->
                 <div class="reviews">
                     <?php
                     $comments = get_comments(['post_id' => get_the_ID()]);
@@ -725,7 +778,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                             <?php
                                 }
                             } else {
-                                echo '<p>No reviews yet. Be the first to leave a review!</p>';
+                                echo '<p class="mt-2">No reviews yet. Be the first to leave a review!</p>';
                             }
                             ?>
                         </div>
@@ -741,7 +794,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                 <div class=" footerbuttoncontainer">
                     <div>
 
-                        <button type="button" id="rejectbutton"  data-bs-toggle="modal" data-bs-target="#rejectModal">Reject Recipe</button>
+                        <button type="button" id="rejectbutton" data-bs-toggle="modal" data-bs-target="#rejectModal">Reject Recipe</button>
                     </div>
                     <div>
 
@@ -775,7 +828,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                 </div>
             </div>
 
-         
+
 
         <?php endif; ?>
 
