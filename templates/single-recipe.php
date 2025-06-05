@@ -28,7 +28,13 @@ $embed_link = str_replace("watch?v=", "embed/", $video_link);
 
 $post = get_post($post_id);
 $author_id = $post->post_author;
-$author_name = get_the_author_meta('display_name', $author_id);
+// First priority: user_meta 'name'
+$name = get_user_meta($author_id, 'name', true);
+
+// Fallback to display_name if 'name' is empty
+if (empty($name)) {
+    $name = get_the_author_meta('display_name', $author_id);
+}
 $location = get_user_meta($author_id, 'location', true);
 $user_image = get_user_meta($author_id, 'user_image', true);
 
@@ -37,7 +43,14 @@ $user_image = get_user_meta($author_id, 'user_image', true);
 $prep_time = null;
 $cooking_time = null;
 $total_time = null;
-$formatted_catagory = implode(', ', $catagory);
+$terms = get_the_terms(get_the_ID(), 'recipe_category');
+
+if (!is_wp_error($terms) && !empty($terms)) {
+    $category_names = wp_list_pluck($terms, 'name'); // extract names only
+    $formatted_category = implode(', ', $category_names); // comma-separated
+} else {
+    $formatted_category = 'Uncategorized';
+}
 $prep_time .= $prep_time_hour ? "$prep_time_hour hour" . ($prep_time_hour > 1 ? 's' : '') : '';
 $prep_time .= $prep_time_minutes ? ($prep_time ? ' ' : '') . "$prep_time_minutes minute" . ($prep_time_minutes > 1 ? 's' : '') : '';
 $cooking_time .= $cooking_time_hour ? "$cooking_time_hour hour" . ($cooking_time_hour > 1 ? 's' : '') : '';
@@ -471,15 +484,17 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
         .jump_to_recipe {
             font-size: 18px;
-            padding:5px 15px;
+            padding: 5px 15px;
         }
 
         hr.mt-4 {
             display: none;
         }
+
         .ingredients_part h1 {
             font-size: 24px;
         }
+
         .ingredients_part h3 {
             font-size: 24px;
         }
@@ -489,7 +504,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 <div class="top-header-title-part" style="background-image: url(' <?php echo esc_url($dish_photo) ?>  ');">
     <div>
         <?php
-        echo '<h1> ererefserterte' . esc_html($post->post_title) . '</h1>';
+        echo '<h1>' . esc_html($post->post_title) . '</h1>';
         ?>
 
     </div>
@@ -561,7 +576,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
             <div class="row">
                 <div class="col-6 col-md-3">
                     <h4 class="meta-name">Category</h4>
-                    <h5 class="meta-value"><?php echo $formatted_catagory; ?></h5>
+                    <h5 class="meta-value"><?php echo esc_html($formatted_category); ?></h5>
                 </div>
                 <div class="col-6 col-md-3">
                     <h4 class="meta-name">Prep Time</h4>
@@ -647,8 +662,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
 
         <div class="nutrition_facts"></div>
-        <?php if (!current_user_can('editor')) : ?>
-
+        <?php if (!current_user_can('editor') && !current_user_can('administrator')) : ?>
             <div class="reviews_container">
                 <div class="row mt-5">
                     <div class="col-4 ">
@@ -832,6 +846,29 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
         <?php endif; ?>
 
+        <?php if (current_user_can('administrator') && $author_id == get_current_user_id()) :
+            $subscribers = get_users(['role' => 'subscriber']);
+
+        ?>
+            <div class="mt-3">
+                <hr>
+                <form id="assign-recipe-form">
+                    <label for="new_author">Assign Recipe to:</label>
+                    <select id="new_author" name="new_author">
+                        <option value="">Select a subscriber</option>
+                        <?php foreach ($subscribers as $user) : ?>
+                            <option value="<?php echo esc_attr($user->ID); ?>"><?php echo esc_html($user->display_name); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <input type="hidden" name="post_id" value="<?php echo esc_attr($post->ID); ?>">
+                  
+
+                    <button type="submit" class="mt-2" >Assign Recipe</button>
+                </form>
+            </div>
+
+        <?php endif; ?>
     </div>
 
 </div>

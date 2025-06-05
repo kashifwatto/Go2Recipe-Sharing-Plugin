@@ -6,6 +6,12 @@ Template Name: Edit Recipe
 if (! defined('ABSPATH')) {
     exit;
 }
+// Redirect non-logged-in users to homepage
+if (!is_user_logged_in()) {
+    wp_redirect(home_url());
+    exit;
+}
+
 // wp_head();
 get_header();
 

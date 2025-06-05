@@ -5,6 +5,12 @@ Template Name: Personal Info
 if (! defined('ABSPATH')) {
     exit;
 }
+// Redirect non-logged-in users to homepage
+if (!is_user_logged_in()) {
+    wp_redirect(home_url());
+    exit;
+}
+
 get_header();
 wp_head();
 $name = '';
@@ -198,10 +204,10 @@ if (is_user_logged_in()) {
                 </div>
                 <div class="form-inner">
                     <label> Your Name </label>
-                    <input type="text" name="name" value="<?php if (is_user_logged_in()) echo $name;  ?>">
+                    <input type="text" name="name" placeholder="Name" value="<?php if (is_user_logged_in()) echo $name;  ?>">
 
                     <label> Your Location </label>
-                    <input type="text" name="location" value="<?php if (is_user_logged_in()) echo $location;  ?>">
+                    <input type="text" name="location" placeholder="Location" value="<?php if (is_user_logged_in()) echo $location;  ?>">
                     <label for="">About You</label>
                     <textarea name="details"> <?php if (is_user_logged_in()) echo $details;  ?></textarea>
                     <label for="">Add an Image</label>

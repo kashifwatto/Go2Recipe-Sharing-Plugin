@@ -54,7 +54,7 @@ jQuery(document).ready(function ($) {
 jQuery(document).ready(function ($) {
     console.log('jQuery Loaded:', $);
     console.log('Ajax URL:', ajax_object.ajax_url);
-// register User
+    // register User
     $(document).on('submit', '#register_user_form', function (e) {
         e.preventDefault();
 
@@ -73,12 +73,12 @@ jQuery(document).ready(function ($) {
             return;
 
         }
-        if(password!=confrimpassword){
+        if (password != confrimpassword) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: 'Password and confirm password should be same',
-            });  
+            });
             return;
         }
 
@@ -98,8 +98,7 @@ jQuery(document).ready(function ($) {
                         text: response.data.message,
                         timer: 2000,
                         showConfirmButton: false,
-                    }).then(() => {
-                        window.location.href = response.data.redirect_url;                    });
+                    })
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -128,7 +127,7 @@ jQuery(document).ready(function ($) {
         const password = $('#login_password').val();
         console.log(email);
         console.log(password);
-        if (!email || !password ) {
+        if (!email || !password) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -155,7 +154,8 @@ jQuery(document).ready(function ($) {
                         timer: 2000,
                         showConfirmButton: false,
                     }).then(() => {
-                        window.location.href = response.data.redirect_url;                    });
+                        window.location.href = response.data.redirect_url;
+                    });
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -184,7 +184,7 @@ jQuery(document).ready(function ($) {
         const email = $('#testeremail').val();
         const password = $('#testerpassword').val();
         const confrimpassword = $('#testerconfrimpassword').val();
-        
+
         if (!email || !password || !confrimpassword) {
             Swal.fire({
                 icon: 'error',
@@ -194,12 +194,12 @@ jQuery(document).ready(function ($) {
             return;
 
         }
-        if(password!=confrimpassword){
+        if (password != confrimpassword) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: 'Password and confirm password should be same',
-            });  
+            });
             return;
         }
 
@@ -220,7 +220,8 @@ jQuery(document).ready(function ($) {
                         timer: 2000,
                         showConfirmButton: false,
                     }).then(() => {
-                        window.location.href = response.data.redirect_url;                    });
+                        window.location.href = response.data.redirect_url;
+                    });
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -240,62 +241,63 @@ jQuery(document).ready(function ($) {
             },
         });
     });
-        // Login Tester 
-        $(document).on('submit', '#login_tester_form', function (e) {
-            e.preventDefault();
-    
-            const email = $('#login_tester_email').val();
-            const password = $('#login_tester_password').val();
-            console.log(email);
-            console.log(password);
-            if (!email || !password ) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Please fill out all fields.',
-                });
-                return;
-    
-            }
-            
-    
-            $.ajax({
-                url: ajax_object.ajax_url,
-                type: 'POST',
-                data: {
-                    action: 'login_recipetester_via_ajax',
-                    email: email,
-                    password: password,
-                },
-                success: function (response) {
-                    if (response.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Login Successful!',
-                            text: response.data.message,
-                            timer: 2000,
-                            showConfirmButton: false,
-                        }).then(() => {
-                            window.location.href = response.data.redirect_url;                    });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.data.message || 'An error occurred.',
-                        });
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error('AJAX Error:', status, error);
-                    console.error('Response:', xhr.responseText);
+    // Login Tester 
+    $(document).on('submit', '#login_tester_form', function (e) {
+        e.preventDefault();
+
+        const email = $('#login_tester_email').val();
+        const password = $('#login_tester_password').val();
+        console.log(email);
+        console.log(password);
+        if (!email || !password) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please fill out all fields.',
+            });
+            return;
+
+        }
+
+
+        $.ajax({
+            url: ajax_object.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'login_recipetester_via_ajax',
+                email: email,
+                password: password,
+            },
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Login Successful!',
+                        text: response.data.message,
+                        timer: 2000,
+                        showConfirmButton: false,
+                    }).then(() => {
+                        window.location.href = response.data.redirect_url;
+                    });
+                } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Unexpected Error',
-                        text: 'An unexpected error occurred. Please try again.',
+                        title: 'Error',
+                        text: response.data.message || 'An error occurred.',
                     });
-                },
-            });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+                console.error('Response:', xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Unexpected Error',
+                    text: 'An unexpected error occurred. Please try again.',
+                });
+            },
         });
+    });
 });
 
 // Ensure script runs in Elementor editor mode
@@ -304,4 +306,6 @@ jQuery(window).on('elementor/frontend/init', function () {
         jQuery(document).trigger('customFormReady');
     });
 });
+
+
 

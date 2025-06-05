@@ -9,12 +9,7 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
     function recipe_sharing_by_kashif_watto_add_recipe()
     {
 
-        // Extract and sanitize form data
-        // error_log('POST Data: ' . print_r($_POST, true));
-
-        $post_status = sanitize_text_field($_POST['post_status']);
-        error_log($post_status);
-        return;
+      
         $title = sanitize_text_field($_POST['title'] ?? '');
         $description = wp_kses_post($_POST['description'] ?? '');
         $inspiration = sanitize_text_field($_POST['inspiration'] ?? '');
@@ -22,7 +17,16 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
         $ingredients = wp_kses_post($_POST['ingredients'] ?? '');
 
 
-        $recipe_category = isset($_POST['recipe_category']) ? array_map('sanitize_text_field', $_POST['recipe_category']) : [];
+        $recipe_category = [];
+
+        if (isset($_POST['recipe_category'])) {
+            if (is_array($_POST['recipe_category'])) {
+                $recipe_category = array_map('sanitize_text_field', $_POST['recipe_category']);
+            } else {
+                // Fallback in case a single value is sent (rare with [] in name, but good to check)
+                $recipe_category = [sanitize_text_field($_POST['recipe_category'])];
+            }
+        }
         $cuisine = sanitize_text_field($_POST['cuisine'] ?? '');
         $preparation_time_hour = sanitize_text_field($_POST['preparation_time_hour'] ?? '');
         $preparation_time_minutes = sanitize_text_field($_POST['preparation_time_minutes'] ?? '');
@@ -34,6 +38,14 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
         $video_link = esc_url_raw($_POST['video_link'] ?? '');
         $recipe_notes = wp_kses_post($_POST['recipe_notes'] ?? '');
         $form_confirm = sanitize_text_field($_POST['formconfirm'] ?? '');
+
+// Get the post status from the form
+        $post_status = sanitize_text_field($_POST['post_status'] ?? 'draft');
+        
+        // Validate status - only allow publish or draft
+        if (!in_array($post_status, ['publish', 'draft'])) {
+            $post_status = 'draft';
+        }
 
 
         // Check if user is logged in
@@ -50,7 +62,7 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
             'post_title'   => $title,
             'post_content' => $description,
             'post_author'  => $user_id,
-            'post_status'  => 'publish', // Set to 'pending' for admin review
+            'post_status'  => $post_status,
             'post_type'    => 'recipe',  // Replace with your custom post type
         ];
 
@@ -64,12 +76,13 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
 
         // Save custom fields and metadata
         // Process Ingredients
-
+        if (!empty($recipe_category)) {
+            wp_set_post_terms($post_id, $recipe_category, 'recipe_category');
+        }
 
         update_post_meta($post_id, '_instructions', $instructions);
         update_post_meta($post_id, '_ingredients', $ingredients);
         update_post_meta($post_id, '_inspiration', $inspiration);
-        update_post_meta($post_id, '_recipe_category', $recipe_category);
         update_post_meta($post_id, '_cuisine', $cuisine);
         update_post_meta($post_id, '_preparation_time_hour', $preparation_time_hour);
         update_post_meta($post_id, '_preparation_time_minutes', $preparation_time_minutes);
@@ -86,24 +99,57 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
         if (!empty($_FILES['dish_photo']['name'])) {
             $dish_photo = $_FILES['dish_photo'];
 
-            // Use WordPress's file handling functions
             require_once(ABSPATH . 'wp-admin/includes/file.php');
+            require_once(ABSPATH . 'wp-admin/includes/media.php');
+            require_once(ABSPATH . 'wp-admin/includes/image.php');
+
+            // Upload the file
             $dish_upload = wp_handle_upload($dish_photo, ['test_form' => false]);
 
             if (isset($dish_upload['file'])) {
                 $dish_photo_url = $dish_upload['url'];
+                $dish_photo_path = $dish_upload['file'];
+                $filetype = wp_check_filetype($dish_photo_path, null);
 
-                // Save the dish photo URL
+                // Create attachment post
+                $attachment = [
+                    'guid'           => $dish_photo_url,
+                    'post_mime_type' => $filetype['type'],
+                    'post_title'     => sanitize_file_name(basename($dish_photo_path)),
+                    'post_content'   => '',
+                    'post_status'    => 'inherit'
+                ];
+
+                // Insert attachment to the media library
+                $attach_id = wp_insert_attachment($attachment, $dish_photo_path, $post_id);
+
+                // Generate metadata and thumbnails
+                $attach_data = wp_generate_attachment_metadata($attach_id, $dish_photo_path);
+                wp_update_attachment_metadata($attach_id, $attach_data);
+
+                // Set as featured image
+                set_post_thumbnail($post_id, $attach_id);
+
+                // Optional: Save the URL to post meta too
                 update_post_meta($post_id, '_dish_photo', $dish_photo_url);
 
-                error_log("Dish photo uploaded successfully: $dish_photo_url");
+                error_log("Dish photo uploaded and set as featured image: $dish_photo_url");
             } else {
                 error_log("Dish photo upload failed: " . $dish_upload['error']);
             }
         }
-
+// Send success response with appropriate message
+        $message = $post_status === 'publish' 
+            ? 'Recipe published successfully!' 
+            : 'Recipe saved as draft!';
+            
         // Send success response
-        wp_send_json_success(['message' => 'Recipe submitted successfully!', 'post_id' => $post_id, 'redirect_url' => site_url('your-recipes/')]);
+                wp_send_json_success([
+            'message' => $message,
+            'post_id' => $post_id,
+            'redirect_url' => site_url('your-recipes/')
+        ]);
+
     }
 }
 
@@ -183,17 +229,41 @@ if (!function_exists('recipe_sharing_by_kashif_watto_edit_recipe')) {
         if (!empty($_FILES['dish_photo']['name'])) {
             $dish_photo = $_FILES['dish_photo'];
 
-            // Use WordPress's file handling functions
             require_once(ABSPATH . 'wp-admin/includes/file.php');
+            require_once(ABSPATH . 'wp-admin/includes/media.php');
+            require_once(ABSPATH . 'wp-admin/includes/image.php');
+
+            // Upload the file
             $dish_upload = wp_handle_upload($dish_photo, ['test_form' => false]);
 
             if (isset($dish_upload['file'])) {
                 $dish_photo_url = $dish_upload['url'];
+                $dish_photo_path = $dish_upload['file'];
+                $filetype = wp_check_filetype($dish_photo_path, null);
 
-                // Save the dish photo URL
+                // Create attachment post
+                $attachment = [
+                    'guid'           => $dish_photo_url,
+                    'post_mime_type' => $filetype['type'],
+                    'post_title'     => sanitize_file_name(basename($dish_photo_path)),
+                    'post_content'   => '',
+                    'post_status'    => 'inherit'
+                ];
+
+                // Insert attachment to the media library
+                $attach_id = wp_insert_attachment($attachment, $dish_photo_path, $post_id);
+
+                // Generate metadata and thumbnails
+                $attach_data = wp_generate_attachment_metadata($attach_id, $dish_photo_path);
+                wp_update_attachment_metadata($attach_id, $attach_data);
+
+                // Set as featured image
+                set_post_thumbnail($post_id, $attach_id);
+
+                // Optional: Save the URL to post meta too
                 update_post_meta($post_id, '_dish_photo', $dish_photo_url);
 
-                error_log("Dish photo uploaded successfully: $dish_photo_url");
+                error_log("Dish photo uploaded and set as featured image: $dish_photo_url");
             } else {
                 error_log("Dish photo upload failed: " . $dish_upload['error']);
             }
@@ -253,3 +323,40 @@ function recipe_sharing_by_kashif_watto_submit_review()
 }
 add_action('wp_ajax_recipe_sharing_by_kashif_watto_submit_review', 'recipe_sharing_by_kashif_watto_submit_review');
 add_action('wp_ajax_nopriv_recipe_sharing_by_kashif_watto_submit_review', 'recipe_sharing_by_kashif_watto_submit_review');
+
+// start of assgin recipe to new user 
+
+function recipe_sharing_by_kashif_watto_assign_recipe_to_new_user()
+{
+
+ $post_id = intval($_POST['post_id']);
+    $new_author_id = intval($_POST['new_author']);
+    $current_user_id = get_current_user_id();
+
+    if (!current_user_can('administrator')) {
+        wp_send_json_error(['message' => 'You are not authorized.']);
+    }
+
+    $post = get_post($post_id);
+    if (!$post || $post->post_type !== 'recipe') {
+        wp_send_json_error(['message' => 'Invalid recipe.']);
+    }
+
+    if ($post->post_author != $current_user_id) {
+        wp_send_json_error(['message' => 'You are not the author of this recipe.']);
+    }
+
+    $new_user = get_userdata($new_author_id);
+    if (!$new_user || !in_array('subscriber', $new_user->roles)) {
+        wp_send_json_error(['message' => 'Selected user is not a subscriber.']);
+    }
+
+    wp_update_post([
+        'ID' => $post_id,
+        'post_author' => $new_author_id
+    ]);
+
+    wp_send_json_success(['message' => 'Recipe successfully reassigned.']);
+}
+add_action('wp_ajax_recipe_sharing_by_kashif_watto_assign_recipe_to_new_user', 'recipe_sharing_by_kashif_watto_assign_recipe_to_new_user');
+add_action('wp_ajax_nopriv_recipe_sharing_by_kashif_watto_assign_recipe_to_new_user', 'recipe_sharing_by_kashif_watto_assign_recipe_to_new_user');

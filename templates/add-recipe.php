@@ -6,8 +6,15 @@ Template Name: Add Recipe
 if (! defined('ABSPATH')) {
     exit;
 }
+// Redirect non-logged-in users to homepage
+if (!is_user_logged_in()) {
+    wp_redirect(home_url());
+    exit;
+}
+
 get_header();
 wp_head();
+
 ?>
 <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap-grid.min.css" integrity="sha512-i1b/nzkVo97VN5WbEtaPebBG8REvjWeqNclJ6AItj7msdVcaveKrlIIByDpvjk5nwHjXkIqGZscVxOrTb9tsMA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
 <script src="https://cdn.tiny.cloud/1/e7j9amg1yznezj5u8xskqm6hbzmpgonvzfmzivqqofxu3jhc/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
@@ -250,7 +257,7 @@ wp_head();
             <div class="row">
                 <div class="col-md-8">
                     <label> Recipe Title </label>
-                    <input type="text" name="title" id="title" placeholder="The name of the recipe">
+                    <input type="text" name="title" required ="title" placeholder="The name of the recipe">
                     <label for="">Recipe Description</label>
                     <textarea name="description" id="">A brief introduction or description of the recipe (e.g., its origin, flavor profile, or personal story behind it)</textarea>
 
@@ -308,18 +315,28 @@ wp_head();
             <div class="row">
                 <div class="col-md-6">
                     <label for="recipe_category"> Recipe Category </label>
-                    <?php $categories = get_option('custom_recipe_categories', []);
+                    <?php // $categories = get_option('custom_recipe_categories', []);
                     ?>
                     <select name="recipe_category[]" id="recipe_category" style="border:none !Important;" class="form-select form-select-solid"
                         data-control="select2" data-close-on-select="false" data-placeholder="Select a Category" data-allow-clear="true" multiple="multiple">
 
-                        <?php foreach ($categories as $category):
-                            // Generate value and label
-                            $value = ucwords(str_replace('_', ' ', $category)); // e.g., 'Quick & Easy' => 'quick-easy'
-                            $label = ucwords(str_replace('_', ' ', $category)); // Format for display
+                        <?php
+                        $categories = get_terms([
+                            'taxonomy' => 'recipe_category',
+                            'hide_empty' => false, // Set to true if you only want categories that have posts
+                        ]);
+
+                        if (!is_wp_error($categories) && !empty($categories)) :
+                            foreach ($categories as $category) :
+                                $value = $category->term_id; // You can use $category->slug if preferred
+                                $label = $category->name;
                         ?>
-                            <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
-                        <?php endforeach; ?>
+                                <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                        <?php
+                            endforeach;
+                        endif;
+                        ?>
+
                     </select>
 
 
@@ -419,7 +436,7 @@ wp_head();
                 </label>
                 <textarea name="recipe_notes"> Any tips or variations the author wants to add (e.g., substitutions, helpful information, advice, or special instructions).</textarea>
             </div>
-            <div class="submitbuttoncontainer row">
+            <!-- <div class="submitbuttoncontainer row">
                 <div class="col-md-6">
 
 
@@ -430,19 +447,57 @@ wp_head();
                     </div>
                 </div>
                 <div class=" col-md-6 ingredients-container-inner-button-container footerbuttoncontainer">
+                    
                     <div>
 
-                        <!-- <button type="button" id="saveasdraft">Save as draft</button> -->
-                    </div>
-                    <div>
 
-                        <button type="submit" id="submitbutton">Publish Recipe</button>
+
+
                     </div>
 
                 </div>
-                <input type="hidden" name="post_status" id="post_status" value="publish">
 
+            </div> -->
+            <div class="submitbuttoncontainer row">
+                <div class="col-md-6">
+                    <div style="margin-bottom:50px;">
+                        <input type="checkbox" name="formconfirm" id="confirm" > 
+                        <label for="confirm" style="font-size:16px; font-weight:400; display:inline">I confirm that this recipe is my own genuine creation.</label>
+                    </div>
+                </div>
+                <div class="col-md-6 ingredients-container-inner-button-container footerbuttoncontainer">
+                    <div class="status-selector">
+                        <select name="post_status" id="post_status">
+                            <option value="publish">Publish Now</option>
+                            <option value="draft">Save as Draft</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit" id="submitbutton">Publish Recipe</button>
+                    </div>
+                </div>
             </div>
+            <style>
+                .status-selector {
+                    margin-bottom: 15px;
+                }
+
+                .status-selector select {
+                    padding: 10px 15px;
+                    border-radius: 34px;
+                    border: 1px solid #ddd;
+                    background-color: #f9f9f9;
+                    font-size: 14px;
+                    width: 100%;
+                    max-width: 200px;
+                    margin-top: 15px;
+                }
+
+                .status-selector select:focus {
+                    outline: none;
+                    border-color: #aaa;
+                }
+            </style>
         </form>
     </div>
 </div>
@@ -471,13 +526,10 @@ wp_head();
                 placeholder: "Select Recipe Categories"
             });
         });
-      
+
     });
-    //   document.getElementById('submitbutton').addEventListener('click', function() {
-    //         document.getElementById('post_status').value = 'publish';
-    //     });
-  
-        
+
+
 </script>
 
 

@@ -51,7 +51,7 @@ function scripts_style_adding()
         true
     );
     wp_enqueue_style('bootstrap-css', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
-        wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js', [], null, true);
+    wp_enqueue_script('bootstrap-js', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js', [], null, true);
     wp_enqueue_style('style-css', plugin_dir_url(__FILE__) . 'assets/css/style.css',);
 
     wp_localize_script('register-user-script', 'ajax_object', [
@@ -77,7 +77,8 @@ add_action('init', function () {
 
 add_action('admin_menu', 'customize_editor_admin_menu', 999);
 
-function customize_editor_admin_menu() {
+function customize_editor_admin_menu()
+{
     // Only modify menu for editors
     if (!current_user_can('editor')) {
         return;
@@ -90,7 +91,7 @@ function customize_editor_admin_menu() {
     remove_menu_page('edit.php?post_type=elementor_library'); // Elementor Templates
     remove_menu_page('edit-comments.php');      // Comments
 
-// for restrict editor to add new recipe 
+    // for restrict editor to add new recipe 
     $restricted_pages = [
         'post-new.php?post_type=recipe', // Add New Recipe
     ];
@@ -105,7 +106,8 @@ function customize_editor_admin_menu() {
 
 add_action('admin_notices', 'show_recipe_redirect_notice');
 
-function show_recipe_redirect_notice() {
+function show_recipe_redirect_notice()
+{
     if (isset($_GET['recipe_redirect_notice']) && current_user_can('editor')) {
         echo '<div class="notice notice-warning is-dismissible">
                 <p>You are not allowed to add new recipes.</p>
@@ -255,6 +257,29 @@ function recipe_sharing_custom_post_type()
 }
 add_action('init', 'recipe_sharing_custom_post_type');
 
+function recipe_sharing_register_taxonomies()
+{
+    register_taxonomy('recipe_category', 'recipe', [
+        'labels' => [
+            'name'              => __('Recipe Categories', 'textdomain'),
+            'singular_name'     => __('Recipe Category', 'textdomain'),
+            'search_items'      => __('Search Categories', 'textdomain'),
+            'all_items'         => __('All Categories', 'textdomain'),
+            'parent_item'       => __('Parent Category', 'textdomain'),
+            'parent_item_colon' => __('Parent Category:', 'textdomain'),
+            'edit_item'         => __('Edit Category', 'textdomain'),
+            'update_item'       => __('Update Category', 'textdomain'),
+            'add_new_item'      => __('Add New Category', 'textdomain'),
+            'new_item_name'     => __('New Category Name', 'textdomain'),
+            'menu_name'         => __('Recipe Categories', 'textdomain'),
+        ],
+        'hierarchical'      => true,
+        'show_in_rest'      => true,
+        'public'            => true,
+        'rewrite'           => ['slug' => 'recipe-category'],
+    ]);
+}
+add_action('init', 'recipe_sharing_register_taxonomies');
 
 function recipe_sharing_add_admin_menu()
 {
@@ -285,9 +310,17 @@ function recipe_sharing_add_admin_menu()
         'recipe_categories',                       // Menu slug
         'render_recipe_categories_page'            // Callback function
     );
+    add_submenu_page(
+        'recipe_sharing',
+        __('Recipe Categoriesn', 'textdomain'),
+        __('Recipe Categoriesn', 'textdomain'),
+        'manage_options',
+        'edit-tags.php?taxonomy=recipe_category&post_type=recipe'
+    );
 }
 
-function recipe_custom_row_actions($actions, $post) {
+function recipe_custom_row_actions($actions, $post)
+{
     if ($post->post_type !== 'recipe') {
         return $actions;
     }
@@ -306,7 +339,7 @@ function recipe_custom_row_actions($actions, $post) {
 
     return $actions;
 }
-add_filter('post_row_actions', 'recipe_custom_row_actions', 10, 2);
+// add_filter('post_row_actions', 'recipe_custom_row_actions', 10, 2);
 
 
 // Callback for parent menu page (optional)
@@ -316,7 +349,8 @@ function recipe_sharing_dashboard_page()
     echo '<p>' . __('Welcome to the Recipe Sharing Dashboard!', 'textdomain') . '</p></div>';
 }
 
-function render_recipe_categories_page() {
+function render_recipe_categories_page()
+{
     // Handle form submission
     if (isset($_POST['save_categories'])) {
         if (current_user_can('manage_options')) {
@@ -330,7 +364,7 @@ function render_recipe_categories_page() {
     // Get stored categories
     $stored_categories = get_option('custom_recipe_categories', []);
     $textarea_value = implode(' | ', $stored_categories); // Join with |
-    ?>
+?>
     <div class="wrap">
         <h1><?php _e('Manage Recipe Categories', 'textdomain'); ?></h1>
         <form method="post">
@@ -340,14 +374,69 @@ function render_recipe_categories_page() {
             <input type="submit" name="save_categories" class="button button-primary" value="<?php _e('Save Categories', 'textdomain'); ?>">
         </form>
     </div>
-    <?php
+<?php
 }
 
 
 
-add_action('admin_menu', 'recipe_sharing_add_admin_menu');
+// add_action('admin_menu', 'recipe_sharing_add_admin_menu');
+
+add_action('init', 'handle_email_verification');
+
+function handle_email_verification()
+{
+    if (isset($_GET['verify_email']) && $_GET['verify_email'] == 1 && isset($_GET['key']) && isset($_GET['user'])) {
+        $user_id = intval($_GET['user']);
+        $key = sanitize_text_field($_GET['key']);
+
+        $saved_key = get_user_meta($user_id, 'email_verification_key', true);
+
+        if ($saved_key === $key) {
+            update_user_meta($user_id, 'is_email_verified', 1);
+            delete_user_meta($user_id, 'email_verification_key');
+            // echo"hello world";
+            wp_redirect(add_query_arg('verified', 'true', home_url()));
+            exit;
+        } else {
+            wp_redirect(add_query_arg('verified', 'false', home_url()));
+            exit;
+        }
+    }
+}
+
+// new user email modify
+
+add_filter('wp_new_user_notification_email', 'custom_new_user_email', 10, 3);
+function custom_new_user_email($email, $user, $blogname)
+{
+    // Get password if passed during registration (only works if you manually pass password)
+    $password = get_user_meta($user->ID, 'plain_password', true);
+
+    $verification_key = get_user_meta($user->ID, 'email_verification_key', true);
+    $verification_url = add_query_arg([
+        'verify_email' => 1,
+        'key' => $verification_key,
+        'user' => $user->ID,
+    ], site_url());
+    $reset_key = get_password_reset_key($user);
+    $reset_url = network_site_url("wp-login.php?action=rp&key=$reset_key&login=" . rawurlencode($user->user_login));
+
+    $message = "Hi {$user->user_login},\n\n";
+    $message .= "Welcome to $blogname!\n\n";
+    $message .= "Here are your login credentials:\n";
+    $message .= "Username: {$user->user_login}\n";
+    $message .= "To set password visit this link: {$reset_url}\n";
 
 
+    $message .= "\nPlease verify your email using the link below:\n";
+    $message .= "$verification_url\n\n";
+    $message .= "Login here by clicking login button: " . home_url() . "\n";
+
+    $email['subject'] = "Welcome to $blogname – Please verify your email at set your password";
+    $email['message'] = $message;
+
+    return $email;
+}
 
 @include('includes/add-recipe.php');
 @include('includes/registeruser.php');

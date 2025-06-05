@@ -5,6 +5,12 @@ Template Name: Your recipe
 if (! defined('ABSPATH')) {
     exit;
 }
+// Redirect non-logged-in users to homepage
+if (!is_user_logged_in()) {
+    wp_redirect(home_url());
+    exit;
+}
+
 get_header();
 wp_head();
 $name = '';
@@ -142,7 +148,7 @@ if (is_user_logged_in()) {
                         </h3>
                     </div>
                 </div>
-               <hr>
+                <hr>
                 <a href="<?php echo site_url('/add-recipe/'); ?>" class="menu">Add new Recipe</a>
 
                 <hr>
@@ -166,7 +172,7 @@ if (is_user_logged_in()) {
                 // Query to fetch all recipes (published and pending) created by the logged-in user
                 $args = array(
                     'post_type'      => 'recipe', // Replace with your custom post type slug
-                    'post_status'    => ['publish', 'pending'], // Fetch both published and pending recipes
+                    'post_status'    => ['publish',  'draft'], // Fetch both published and pending recipes
                     'author'         => $current_user_id,
                     'posts_per_page' => -1, // Fetch all recipes
                 );
@@ -218,7 +224,10 @@ if (is_user_logged_in()) {
                                     <td style="width:50%;">
                                         <h4 class="recipe_title">
                                             <a href="<?php echo get_permalink(); ?>">
-                                                <?php the_title(); ?>
+                                                <?php the_title();
+                                                if (get_post_status() === 'draft') {
+                                                    echo ' - Draft';
+                                                } ?>
                                             </a>
 
                                         </h4>
@@ -228,13 +237,13 @@ if (is_user_logged_in()) {
                                                                     ?></p>
                                     </td> -->
                                     <td><?php
-                                    if($average_rating > 0){
-                                        echo '<p class="recipe_rating">';
-                                        echo '<span style="color: red;">&#9733;</span> ' . number_format($average_rating, 1);
-                                        echo '</p>';
-                                    }else{
-                                        echo '<p>N/A</p>';
-                                    }
+                                        if ($average_rating > 0) {
+                                            echo '<p class="recipe_rating">';
+                                            echo '<span style="color: red;">&#9733;</span> ' . number_format($average_rating, 1);
+                                            echo '</p>';
+                                        } else {
+                                            echo '<p>N/A</p>';
+                                        }
                                         ?></td>
                                     <td>
                                         <a href="<?php echo get_edit_post_link(get_the_ID()); ?>" class=" ">
