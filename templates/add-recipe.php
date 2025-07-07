@@ -23,6 +23,51 @@ wp_head();
 
 
 <style>
+    textarea {
+    border: 1px solid rgba(171, 167, 167, 1);
+    border-radius: 16px !important;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    color: rgba(102, 102, 102, 1);
+    height: 100px;
+}
+
+label {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 32px;
+    color: rgba(48, 48, 48, 1);
+    margin: 15px 0px;
+
+}
+
+input {
+    border: 1px solid rgba(171, 167, 167, 1) !important;
+    border-radius: 100px !important;
+    padding: 15px !important;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    color: rgba(102, 102, 102, 1);
+}
+
+select {
+    border: 1px solid rgba(171, 167, 167, 1);
+    border-radius: 100px;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    color: rgba(102, 102, 102, 1);
+}
+ input:focus,
+ textarea:focus,
+ select:focus {
+    outline: none !important;
+    border: 1px solid rgba(171, 167, 167, 1) !important;
+}
+
     .add-recipe-top-header {
         width: 100%;
         height: 450px;
@@ -259,7 +304,7 @@ wp_head();
                     <label> Recipe Title </label>
                     <input type="text" name="title" required ="title" placeholder="The name of the recipe">
                     <label for="">Recipe Description</label>
-                    <textarea name="description" id="">A brief introduction or description of the recipe (e.g., its origin, flavor profile, or personal story behind it)</textarea>
+                    <textarea name="description" id="" required placeholder="A brief introduction or description of the recipe (e.g., its origin, flavor profile, or personal story behind it)"></textarea>
 
                 </div>
                 <div class="col-md-4 d-flex justify-content-end align-items-center  flex-column">
@@ -267,7 +312,7 @@ wp_head();
                     <label class="photo-upload">
                         <img src="https://img.icons8.com/ios/50/000000/camera--v1.png" alt="Camera Icon" id="dish_photo_preview">
                         <span class="span">Add Photo</span>
-                        <input name="dish_photo" id="dish_photo_input" type="file" accept="image/*">
+                        <input name="dish_photo" id="dish_photo_input" required type="file" accept="image/*">
                     </label>
                 </div>
             </div>
@@ -398,18 +443,27 @@ wp_head();
                 <div class="col-md-6">
                     <label> Preparation Time </label>
                     <div class="row">
-                        <div class="col-6"> <input type="text" name="preparation_time_hour" placeholder="1 hour">
+                        <div class="col-6"> 
+                            <p style="line-height:1px;">Hours</p>
+                            <input type="number" min="1" name="preparation_time_hour" placeholder="1">
                         </div>
-                        <div class="col-6"> <input type="text" name="preparation_time_minutes" placeholder="15 minutes">
+
+                        <div class="col-6"> 
+                             <p style="line-height:1px;">Minutes</p>
+                            <input type="number" min="1" name="preparation_time_minutes" placeholder="15">
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <label> Cooking Time </label>
                     <div class="row">
-                        <div class="col-6"> <input type="text" name="cooking_time_hour" placeholder="1 hour">
+                        <div class="col-6"> 
+                            <p style="line-height:1px;">Hours</p>
+                            <input type="number" min="1" name="cooking_time_hour" placeholder="1">
                         </div>
-                        <div class="col-6"> <input type="text" name="cooking_time_minutes" placeholder="15 minutes">
+                        <div class="col-6">
+                             <p style="line-height:1px;">Minutes</p>
+                             <input type="number" min="1" name="cooking_time_minutes" placeholder="15">
                         </div>
                     </div>
                 </div>
@@ -419,22 +473,26 @@ wp_head();
                 <div class="col-md-6">
                     <label> Total Time </label>
                     <div class="row">
-                        <div class="col-6"> <input type="text" name="total_time_hour" placeholder="1 hour">
+                        <div class="col-6"> 
+                            <p style="line-height:1px;">Hours</p>
+                            <input type="number" min="1" name="total_time_hour" placeholder="1">
                         </div>
-                        <div class="col-6"> <input type="text" name="total_time_minutes" placeholder="15 minutes">
+                        <div class="col-6"> 
+                             <p style="line-height:1px;">Minutes</p>
+                            <input type="number" min="1" name="total_time_minutes" placeholder="15">
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <label> Serving </label>
-                    <input type="number" name="serving" placeholder="5 People">
+                    <input type="number" min="1" name="serving" placeholder="5 People">
                 </div>
             </div>
 
             <div>
                 <label> Recipe Notes (Optional)
                 </label>
-                <textarea name="recipe_notes"> Any tips or variations the author wants to add (e.g., substitutions, helpful information, advice, or special instructions).</textarea>
+                <textarea name="recipe_notes" placeholder="Any tips or variations the author wants to add (e.g., substitutions, helpful information, advice, or special instructions)."> </textarea>
             </div>
             <!-- <div class="submitbuttoncontainer row">
                 <div class="col-md-6">
@@ -461,7 +519,7 @@ wp_head();
             <div class="submitbuttoncontainer row">
                 <div class="col-md-6">
                     <div style="margin-bottom:50px;">
-                        <input type="checkbox" name="formconfirm" id="confirm" > 
+                        <input type="checkbox" name="formconfirm" required id="confirm" > 
                         <label for="confirm" style="font-size:16px; font-weight:400; display:inline">I confirm that this recipe is my own genuine creation.</label>
                     </div>
                 </div>

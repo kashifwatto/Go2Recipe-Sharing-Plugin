@@ -134,35 +134,57 @@ if (is_user_logged_in()) {
         background-color: transparent !important;
 
     }
+
+    textarea {
+        border: 1px solid rgba(171, 167, 167, 1);
+        border-radius: 16px !important;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        color: rgba(102, 102, 102, 1);
+        height: 100px;
+    }
+
+    label {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 32px;
+        color: rgba(48, 48, 48, 1);
+        margin: 15px 0px;
+
+    }
+
+    input {
+        border: 1px solid rgba(171, 167, 167, 1) !important;
+        border-radius: 100px !important;
+        padding: 15px !important;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        color: rgba(102, 102, 102, 1);
+    }
+
+    select {
+        border: 1px solid rgba(171, 167, 167, 1);
+        border-radius: 100px;
+        padding: 15px;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        color: rgba(102, 102, 102, 1);
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none !important;
+        border: 1px solid rgba(171, 167, 167, 1) !important;
+    }
 </style>
 <div class="container">
     <div class="row">
         <div class="col-md-4 info-menu">
-            <div class="menu-inner">
-                <div class="row">
-                    <div class="col-4"><img src="<?php echo esc_url(recipe_sharing_dir_folder . '/assets/images/user-img.png'); ?>" alt=""></div>
-                    <div class="col-8">
-                        <h3 class="email">
-                            <?php if (is_user_logged_in()) echo 'Hi, ' . esc_html(wp_get_current_user()->user_email); ?>
-
-                        </h3>
-                    </div>
-                </div>
-                <hr>
-                <a href="<?php echo site_url('/add-recipe/'); ?>" class="menu">Add new Recipe</a>
-
-                <hr>
-                <a href="<?php echo site_url('/personal-info/'); ?>" class="menu ">Personal Info</a>
-                <hr>
-                <a href="<?php echo site_url('/your-recipes/'); ?>" class="menu active">Your Recipes</a>
-                <hr>
-                <!-- <a href="<?php // echo site_url('/saved-recipes-collections/'); 
-                                ?>" class="menu">Saved Recipes & Collections</a> -->
-            </div>
-
-            <div>
-                <img src="<?php echo esc_url(recipe_sharing_dir_folder . '/assets/images/4.png'); ?>" alt="">
-            </div>
+            <?php @include('personalinfo-sidebar.php'); ?>
         </div>
         <div class="col-md-8 info-setting-container">
             <?php

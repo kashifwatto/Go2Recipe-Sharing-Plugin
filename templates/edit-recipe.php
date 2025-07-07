@@ -46,6 +46,51 @@ $instructions = get_post_meta($post_id, '_instructions', true);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
+    textarea {
+    border: 1px solid rgba(171, 167, 167, 1);
+    border-radius: 16px !important;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    color: rgba(102, 102, 102, 1);
+    height: 100px;
+}
+
+label {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 32px;
+    color: rgba(48, 48, 48, 1);
+    margin: 15px 0px;
+
+}
+
+input {
+    border: 1px solid rgba(171, 167, 167, 1) !important;
+    border-radius: 100px !important;
+    padding: 15px !important;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    color: rgba(102, 102, 102, 1);
+}
+
+select {
+    border: 1px solid rgba(171, 167, 167, 1);
+    border-radius: 100px;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    color: rgba(102, 102, 102, 1);
+}
+ input:focus,
+ textarea:focus,
+ select:focus {
+    outline: none !important;
+    border: 1px solid rgba(171, 167, 167, 1) !important;
+}
+
     .add-recipe-top-header {
         width: 100%;
         height: 450px;

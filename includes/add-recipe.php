@@ -9,7 +9,7 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
     function recipe_sharing_by_kashif_watto_add_recipe()
     {
 
-      
+
         $title = sanitize_text_field($_POST['title'] ?? '');
         $description = wp_kses_post($_POST['description'] ?? '');
         $inspiration = sanitize_text_field($_POST['inspiration'] ?? '');
@@ -39,9 +39,9 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
         $recipe_notes = wp_kses_post($_POST['recipe_notes'] ?? '');
         $form_confirm = sanitize_text_field($_POST['formconfirm'] ?? '');
 
-// Get the post status from the form
+        // Get the post status from the form
         $post_status = sanitize_text_field($_POST['post_status'] ?? 'draft');
-        
+
         // Validate status - only allow publish or draft
         if (!in_array($post_status, ['publish', 'draft'])) {
             $post_status = 'draft';
@@ -138,18 +138,17 @@ if (!function_exists('recipe_sharing_by_kashif_watto_add_recipe')) {
                 error_log("Dish photo upload failed: " . $dish_upload['error']);
             }
         }
-// Send success response with appropriate message
-        $message = $post_status === 'publish' 
-            ? 'Recipe published successfully!' 
+        // Send success response with appropriate message
+        $message = $post_status === 'publish'
+            ? 'Recipe published successfully!'
             : 'Recipe saved as draft!';
-            
+
         // Send success response
-                wp_send_json_success([
+        wp_send_json_success([
             'message' => $message,
             'post_id' => $post_id,
             'redirect_url' => site_url('your-recipes/')
         ]);
-
     }
 }
 
@@ -283,44 +282,41 @@ if (!function_exists('recipe_sharing_by_kashif_watto_edit_recipe')) {
 
 function recipe_sharing_by_kashif_watto_submit_review()
 {
-    // Ensure user is logged in
-    if (!is_user_logged_in()) {
-        wp_send_json_error(['message' => 'You must be logged in to submit a review.']);
+    // Honeypot spam check (explained below)
+    if (!empty($_POST['honeypot'])) {
+        wp_send_json_error(['message' => 'Spam detected.']);
     }
 
     // Get and sanitize input values
     $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
     $comment_content = isset($_POST['comment']) ? sanitize_textarea_field($_POST['comment']) : '';
     $rating = isset($_POST['rating']) ? intval($_POST['rating']) : 0;
-    $user_id = get_current_user_id();
-    $user = get_userdata($user_id);
 
-    // Validate input
     if (!$post_id || empty($comment_content) || $rating < 1 || $rating > 5) {
         wp_send_json_error(['message' => 'Invalid input data.']);
     }
 
-    // Prepare comment data
+    // Prepare comment data (anonymous)
     $comment_data = [
         'comment_post_ID' => $post_id,
         'comment_content' => $comment_content,
-        'comment_author' => $user->display_name, // Use logged-in user's display name
-        'comment_author_email' => $user->user_email, // Use logged-in user's email
-        'user_id' => $user_id, // Set comment author as logged-in user
-        'comment_approved' => 1, // Auto-approve comments
+        'comment_author' => 'Anonymous', // Hide name
+        'comment_author_email' => '', // Blank email
+        'user_id' => 0, // Not a logged-in user
+        'comment_approved' => 1,
     ];
 
-    // Insert comment into the database
+    // Insert comment
     $comment_id = wp_insert_comment($comment_data);
 
-    // Save rating as comment meta
     if ($comment_id) {
         add_comment_meta($comment_id, 'rating', $rating);
-        wp_send_json_success(['message' => 'Your review has been submitted successfully!']);
+        wp_send_json_success(['message' => 'Thank you for your review!']);
     } else {
-        wp_send_json_error(['message' => 'Failed to submit your review.']);
+        wp_send_json_error(['message' => 'Could not save your review.']);
     }
 }
+
 add_action('wp_ajax_recipe_sharing_by_kashif_watto_submit_review', 'recipe_sharing_by_kashif_watto_submit_review');
 add_action('wp_ajax_nopriv_recipe_sharing_by_kashif_watto_submit_review', 'recipe_sharing_by_kashif_watto_submit_review');
 
@@ -329,7 +325,7 @@ add_action('wp_ajax_nopriv_recipe_sharing_by_kashif_watto_submit_review', 'recip
 function recipe_sharing_by_kashif_watto_assign_recipe_to_new_user()
 {
 
- $post_id = intval($_POST['post_id']);
+    $post_id = intval($_POST['post_id']);
     $new_author_id = intval($_POST['new_author']);
     $current_user_id = get_current_user_id();
 

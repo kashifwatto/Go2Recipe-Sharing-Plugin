@@ -60,6 +60,8 @@ jQuery(document).ready(function ($) {
 
         const email = $('#email').val();
         const password = $('#password').val();
+        const fname = $('#fname').val();
+        const lname = $('#lname').val();
         const confrimpassword = $('#confrimpassword').val();
         console.log(email);
         console.log(password);
@@ -89,6 +91,8 @@ jQuery(document).ready(function ($) {
                 action: 'register_user_via_ajax',
                 email: email,
                 password: password,
+                fname: fname,
+                lname: lname,
             },
             success: function (response) {
                 if (response.success) {

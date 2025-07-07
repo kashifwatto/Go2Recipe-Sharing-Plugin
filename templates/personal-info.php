@@ -16,19 +16,71 @@ wp_head();
 $name = '';
 $location = '';
 $details = '';
-$user_image = 'https://img.icons8.com/ios/50/000000/camera--v1.png';
+$user_image = '';
 if (is_user_logged_in()) {
     $current_user_id = get_current_user_id();
 
     // Retrieve user meta
-    $name = get_user_meta($current_user_id, 'name', true);
+    $name = get_user_meta($current_user_id, 'fristname', true);
     $location = get_user_meta($current_user_id, 'location', true);
     $details = get_user_meta($current_user_id, 'details', true);
     $user_image = get_user_meta($current_user_id, 'user_image', true);
 }
+$placeholder_image = 'http://go2recipe.com/wp-content/uploads/2025/07/placeholderimage.png';
+
+if (empty($user_image)) {
+    $user_image = $placeholder_image;
+}
+
+$is_custom_image = ($user_image !== $placeholder_image);
 ?>
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap-grid.min.css" integrity="sha512-i1b/nzkVo97VN5WbEtaPebBG8REvjWeqNclJ6AItj7msdVcaveKrlIIByDpvjk5nwHjXkIqGZscVxOrTb9tsMA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
 <style>
+    textarea {
+        border: 1px solid rgba(171, 167, 167, 1);
+        border-radius: 16px !important;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        color: rgba(102, 102, 102, 1);
+        height: 100px;
+    }
+
+    label {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 32px;
+        color: rgba(48, 48, 48, 1);
+        margin: 15px 0px;
+
+    }
+
+    input {
+        border: 1px solid rgba(171, 167, 167, 1) !important;
+        border-radius: 100px !important;
+        padding: 15px !important;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        color: rgba(102, 102, 102, 1);
+    }
+
+    select {
+        border: 1px solid rgba(171, 167, 167, 1);
+        border-radius: 100px;
+        padding: 15px;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 22px;
+        color: rgba(102, 102, 102, 1);
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none !important;
+        border: 1px solid rgba(171, 167, 167, 1) !important;
+    }
+
     .menu-inner,
     .info-setting-container {
         background-color: rgba(248, 247, 246, 1);
@@ -57,6 +109,8 @@ if (is_user_logged_in()) {
         font-weight: 600;
         line-height: 36px;
         color: rgba(48, 48, 48, 1);
+        display: flex;
+        align-items: center;
     }
 
     .menu {
@@ -164,31 +218,7 @@ if (is_user_logged_in()) {
 <div class="container">
     <div class="row">
         <div class="col-md-4 info-menu">
-            <div class="menu-inner">
-                <div class="row">
-                    <div class="col-4"><img src="<?php echo esc_url(recipe_sharing_dir_folder . '/assets/images/user-img.png'); ?>" alt=""></div>
-                    <div class="col-8">
-                        <h3 class="email">
-                            <?php if (is_user_logged_in()) echo 'Hi, ' . esc_html(wp_get_current_user()->user_email); ?>
-
-                        </h3>
-                    </div>
-                </div>
-                <hr>
-                <a href="<?php echo site_url('/add-recipe/'); ?>" class="menu">Add new Recipe</a>
-
-                <hr>
-                <a href="<?php echo site_url('/personal-info/'); ?>" class="menu active">Personal Info</a>
-                <hr>
-                <a href="<?php echo site_url('/your-recipes/'); ?>" class="menu">Your Recipes</a>
-                <hr>
-                <!-- <a href="<?php // echo site_url('/saved-recipes-collections/'); 
-                                ?>" class="menu">Saved Recipes & Collections</a> -->
-            </div>
-
-            <div>
-                <img src="<?php echo esc_url(recipe_sharing_dir_folder . '/assets/images/4.png'); ?>" alt="">
-            </div>
+            <?php @include('personalinfo-sidebar.php'); ?>
         </div>
         <div class="col-md-8 info-setting-container">
             <form id="personal-info-form" enctype="multipart/form-data" method="post">
@@ -204,7 +234,7 @@ if (is_user_logged_in()) {
                 </div>
                 <div class="form-inner">
                     <label> Your Name </label>
-                    <input type="text" name="name" placeholder="Name" value="<?php if (is_user_logged_in()) echo $name;  ?>">
+                    <input type="text" name="name" placeholder="Frist Name" value="<?php if (is_user_logged_in()) echo $name;  ?>">
 
                     <label> Your Location </label>
                     <input type="text" name="location" placeholder="Location" value="<?php if (is_user_logged_in()) echo $location;  ?>">
@@ -213,10 +243,11 @@ if (is_user_logged_in()) {
                     <label for="">Add an Image</label>
                     <label class="photo-upload">
                         <div class="imagePreviewcontainer">
-
-                            <img id="imagePreview" src="<?php echo $user_image;  ?>" alt="Camera Icon">
+                            <img id="imagePreview" src="<?php echo esc_url($user_image); ?>" alt="User Image">
                         </div>
-                        <span>Add Photo</span>
+
+                        <span id="uploadLabel"><?php echo $is_custom_image ? 'Edit Photo' : 'Add Photo'; ?></span>
+
                         <input id="imageInput" name="userimage" type="file" accept="image/*">
                     </label>
                 </div>
@@ -226,20 +257,20 @@ if (is_user_logged_in()) {
     </div>
 </div>
 <script>
-    document.getElementById('imageInput').addEventListener('change', function(event) {
-        const input = event.target;
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
+document.getElementById('imageInput').addEventListener('change', function(event) {
+    const input = event.target;
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imagePreview = document.getElementById('imagePreview');
+            imagePreview.src = e.target.result;
 
-            reader.onload = function(e) {
-                const imagePreview = document.getElementById('imagePreview');
-                imagePreview.src = e.target.result; // Set the preview image to the file's data URL
-
-            };
-
-            reader.readAsDataURL(input.files[0]); // Read the file as a data URL
-        }
-    });
+            // Update the label to say "Edit Photo" after upload
+            document.getElementById('uploadLabel').textContent = 'Edit Photo';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+});
 </script>
 
 <?php get_footer(); ?>

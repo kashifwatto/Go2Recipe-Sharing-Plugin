@@ -14,6 +14,8 @@ function register_user_via_ajax()
     }
 
     $email = sanitize_email($_POST['email']);
+    $fname = sanitize_text_field($_POST['fname']);
+    $lname = sanitize_text_field($_POST['lname']);
     $password = sanitize_text_field($_POST['password']);
     error_log($email);
     if (empty($email) || empty($password)) {
@@ -40,6 +42,8 @@ function register_user_via_ajax()
     $verification_key = md5(time() . $email);
     update_user_meta($user_id, 'is_email_verified', 0);
     update_user_meta($user_id, 'email_verification_key', $verification_key);
+    update_user_meta($user_id, 'fristname', $fname);
+    update_user_meta($user_id, 'lastname', $lname);
 
 
 
@@ -50,11 +54,74 @@ function register_user_via_ajax()
         'key' => $verification_key,
         'user' => $user_id,
     ], site_url());
+// Prepare email
+$subject = '✅ Please Verify Your Email to Get Started';
+$headers = ['Content-Type: text/html; charset=UTF-8'];
 
-    $subject = 'Verify your email at go2recipe.com';
-    $message = "Click the link to verify your email: $verification_url";
-    wp_mail($email, $subject, $message);
+// Optional: Logo URL
+$logo_url = 'https://go2recipe.com/wp-content/uploads/2025/01/image-359.png'; // replace with your actual logo path
 
+// HTML email content
+$message = "
+<html>
+<head>
+  <style>
+    .email-wrapper {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      padding: 40px 20px;
+      text-align: center;
+      color: #333;
+    }
+    .email-content {
+      background: #fff;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .logo {
+      max-width: 150px;
+      margin-bottom: 20px;
+    }
+    .verify-button {
+      display: inline-block;
+      margin: 25px 0;
+      padding: 12px 30px;
+      background-color: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    .footer {
+      font-size: 12px;
+      color: #888;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class='email-wrapper'>
+    <div class='email-content'>
+      <img src='$logo_url' alt='Go2Recipe Logo' class='logo' />
+      <h2>Hi " . esc_html($fname) . ",</h2>
+      <p>Thanks for signing up! To complete your registration and activate your account, please verify your email address by clicking the button below:</p>
+      <a href='$verification_url' class='verify-button'>👉 Verify Email</a>
+      <p>If the button doesn't work, copy and paste this link into your browser:</p>
+      <p><a href='$verification_url'>$verification_url</a></p>
+      <p>If you didn’t sign up for this account, please ignore this email.</p>
+      <p>Thanks,<br><strong>Go To Recipe Team</strong></p>
+    </div>
+    <div class='footer'>© " . date('Y') . " Go To Recipe. All rights reserved.</div>
+  </div>
+</body>
+</html>
+";
+
+// Send email
+wp_mail($email, $subject, $message, $headers);
 
     // Success response.
     wp_send_json_success(['message' => 'User registered successfully. Varify Your Email']);

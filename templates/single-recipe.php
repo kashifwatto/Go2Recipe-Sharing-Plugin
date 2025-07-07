@@ -29,7 +29,7 @@ $embed_link = str_replace("watch?v=", "embed/", $video_link);
 $post = get_post($post_id);
 $author_id = $post->post_author;
 // First priority: user_meta 'name'
-$name = get_user_meta($author_id, 'name', true);
+$name = get_user_meta($author_id, 'fristname', true);
 
 // Fallback to display_name if 'name' is empty
 if (empty($name)) {
@@ -114,6 +114,12 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
     .container-part-inner {
         width: 90%;
     }
+
+    .container-part-inner .description-container img {
+        height: 350px;
+        width: 100%;
+    }
+
 
     .image-part img {
         width: 50px;
@@ -462,6 +468,8 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
         .top-header-title-part {
             padding: 10px;
+            background-position: center right;
+
         }
 
         .top-header-title-part h1 {
@@ -501,7 +509,8 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
     }
 </style>
 
-<div class="top-header-title-part" style="background-image: url(' <?php echo esc_url($dish_photo) ?>  ');">
+
+<div class="top-header-title-part" style="background-image: url('https://go2recipe.com/wp-content/uploads/2025/06/call-to-action-v2-1-scaled.png');">
     <div>
         <?php
         echo '<h1>' . esc_html($post->post_title) . '</h1>';
@@ -509,17 +518,18 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
     </div>
     <div>
-        <button>
+        <!-- <button>
             <span> Add To Favorite </span> <svg width="17" height="17" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.3671 3.84166C16.9415 3.41583 16.4361 3.07803 15.8799 2.84757C15.3237 2.6171 14.7275 2.49847 14.1254 2.49847C13.5234 2.49847 12.9272 2.6171 12.371 2.84757C11.8147 3.07803 11.3094 3.41583 10.8838 3.84166L10.0004 4.725L9.11709 3.84166C8.25735 2.98192 7.09128 2.49892 5.87542 2.49892C4.65956 2.49892 3.4935 2.98192 2.63376 3.84166C1.77401 4.70141 1.29102 5.86747 1.29102 7.08333C1.29102 8.29919 1.77401 9.46525 2.63376 10.325L3.51709 11.2083L10.0004 17.6917L16.4838 11.2083L17.3671 10.325C17.7929 9.89937 18.1307 9.39401 18.3612 8.83779C18.5917 8.28158 18.7103 7.6854 18.7103 7.08333C18.7103 6.48126 18.5917 5.88508 18.3612 5.32887C18.1307 4.77265 17.7929 4.26729 17.3671 3.84166Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
 
-        </button>
+        </button> -->
     </div>
 
 </div>
 <div class="container-part">
-    <?php if ($video_link) { ?>
+    <!-- <? php // if ($video_link) { 
+            ?>
         <div class="media-container">
 
             <h2 class="container-heading">
@@ -529,7 +539,8 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
             <div>
                 <iframe width="100%" height="315"
-                    src="<?php echo $embed_link;  ?>"
+                    src="<? php // echo $embed_link;  
+                            ?>"
                     title="YouTube video player"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -537,18 +548,27 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                 </iframe>
             </div>
         </div>
-    <?php } ?>
+    <?php // } 
+    ?> -->
     <div class="container-part-inner">
         <div class="description-container">
-            <h2 class="container-heading">
-                Description
-            </h2>
-            <p class="description">
-                <?php the_content(); ?>
-            </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="container-heading">
+                        <?php echo esc_html($post->post_title) ?>
+                    </h2>
+                    <p class="description">
+                        <?php the_content(); ?>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <img src="<?php echo esc_url($dish_photo) ?> " alt="dishphoto">
+                </div>
+            </div>
+
         </div>
 
-        <div class="author-profile-part row">
+        <div class="author-profile-part row mt-3">
             <div class="col-md-6">
                 <div class="image-part d-flex gap-3 ">
                     <div>
@@ -556,7 +576,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                     </div>
                     <div>
                         <h3 class="name">
-                            <?php echo $author_name; ?>
+                            <?php echo $name; ?>
                         </h3>
                         <h4 class="location">
                             <?php echo $location; ?>
@@ -566,8 +586,8 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
             </div>
             <div class="col-md-6 d-flex justify-content-end">
                 <div class="button-part d-flex justify-content-end align-items-center ">
-                    <button> VIew Profile</button>
-                    <button> Add To Favorite</button>
+                    <!-- <button> VIew Profile</button> -->
+                    <!-- <button> Add To Favorite</button> -->
                 </div>
             </div>
         </div>
@@ -623,7 +643,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                 <hr class="mt-4">
             </div>
             <div class="col-4 d-flex justify-content-center align-items-center">
-                <button class="jump_to_recipe">Jump To Recipe</button>
+                <!-- <button class="jump_to_recipe">Jump To Recipe</button> -->
             </div>
             <div class="col-4">
                 <hr class="mt-4">
@@ -662,7 +682,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
 
 
         <div class="nutrition_facts"></div>
-        <?php if (!current_user_can('editor') && !current_user_can('administrator')) : ?>
+        <?php if (true) : ?>
             <div class="reviews_container">
                 <div class="row mt-5">
                     <div class="col-4 ">
@@ -714,7 +734,7 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                         <!-- <h3>Apple Pie by Grandma Ople</h3> -->
 
                         <?php $comments = get_comments(['post_id' => $post_id, 'status' => 'approve']);
-                        if (empty($comments)) {
+                        if (true) {
                         ?>
 
                             <div class="review-form">
@@ -752,49 +772,32 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                                         <button type="button" class="btn-cancel mx-2">Cancel</button>
                                         <button type="submit" class="btn-submit">Submit</button>
                                     </div>
+                                    <input type="text" name="honeypot" style="display: none;">
+
                                     <input type="hidden" name="post_id" value="<?php echo $post_id; ?>" />
                                     <input type="hidden" name="comment_parent" value="0" />
                                 </form>
                             </div>
 
                         <?php } ?>
+                        <hr>
                         <div>
                             <?php
-                            // Fetch existing comments (reviews) for the current post
-                            $comments = get_comments(['post_id' => $post_id, 'status' => 'approve']);
-                            if (!empty($comments)) {
-                                foreach ($comments as $comment) {
-                                    $rating = get_comment_meta($comment->comment_ID, 'rating', true);
-                                    $author_id = $comment->user_id;
-                                    $user_image = get_user_meta($author_id, 'user_image', true);
-
+                            foreach ($comments as $comment) {
+                                $rating = get_comment_meta($comment->comment_ID, 'rating', true);
                             ?>
-                                    <div class="review">
-
-                                        <div class="image-part d-flex gap-3 ">
-                                            <div>
-                                                <img src="<?php echo $user_image;  ?>" alt="">
-                                            </div>
-                                            <div class="mx-2">
-                                                <p class="name" style="margin-bottom: -5px;">
-                                                    <?php echo esc_html($comment->comment_author);  ?>
-                                                </p>
-
-                                                <p><?php echo str_repeat('⭐', (int)$rating); ?></p>
-
-
-                                            </div>
+                                <div class="review">
+                                    <div class="d-flex gap-3">
+                                        <div class="mx-2">
+                                            <p class="name" style="margin-bottom: -5px;">Anonymous</p>
+                                            <p><?php echo str_repeat('⭐', (int)$rating); ?></p>
                                         </div>
-
-                                        <p><?php echo esc_html($comment->comment_content); ?></p>
                                     </div>
-                                    <hr>
-                            <?php
-                                }
-                            } else {
-                                echo '<p class="mt-2">No reviews yet. Be the first to leave a review!</p>';
-                            }
-                            ?>
+                                    <p><?php echo esc_html($comment->comment_content); ?></p>
+                                </div>
+                                <hr>
+                            <?php } ?>
+
                         </div>
                     </div>
                 </div>
@@ -862,9 +865,9 @@ $total_time .= $total_time_minutes ? ($total_time ? ' ' : '') . "$total_time_min
                     </select>
 
                     <input type="hidden" name="post_id" value="<?php echo esc_attr($post->ID); ?>">
-                  
 
-                    <button type="submit" class="mt-2" >Assign Recipe</button>
+
+                    <button type="submit" class="mt-2">Assign Recipe</button>
                 </form>
             </div>
 
